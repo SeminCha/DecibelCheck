@@ -1,0 +1,209 @@
+package ensharp.decibelcheck;
+
+import android.app.ActivityManager;
+import android.bluetooth.BluetoothA2dp;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothHeadset;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.widget.TextView;
+
+import java.util.Iterator;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    public TextView normalEarphoneTxt;
+    public TextView bluetoothEarphoneTxt;
+    public TextView musicOnTxt;
+    public TextView currentPlayingAppTxt;
+
+    private static final String BLUETOOTH_HEADSET_ACTION = "android.bluetooth.headset.action.STATE_CHANGED";
+    private static final String BLUETOOTH_HEADSET_STATE = "android.bluetooth.headset.extra.STATE";
+
+    private static IntentFilter mIntentFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+    private static BroadcastReceiver mBroadcastReceiver = null;
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothHeadset mBluetoothHeadset;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        normalEarphoneTxt = (TextView) findViewById(R.id.earphoneTxt);
+        bluetoothEarphoneTxt = (TextView) findViewById(R.id.bluetoothTxt);
+        musicOnTxt = (TextView) findViewById(R.id.musicOnTxt);
+        currentPlayingAppTxt = (TextView) findViewById(R.id.currentPlayingAppTxt);
+        String name = "목록 ";
+        int count = 0;
+
+        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        if (manager.isMusicActive()) {
+            musicOnTxt.setText("Yes");
+        } else {
+            musicOnTxt.setText("No");
+        }
+
+        ActivityManager am = (ActivityManager)this.getSystemService(ACTIVITY_SERVICE);
+        List l = am.getRunningAppProcesses();
+        Iterator i = l.iterator();
+        PackageManager pm = this.getPackageManager();
+        while(i.hasNext()) {
+            ActivityManager.RunningAppProcessInfo info = (ActivityManager.RunningAppProcessInfo)(i.next());
+            try {
+                CharSequence c = pm.getApplicationLabel(pm.getApplicationInfo(info.processName, PackageManager.GET_META_DATA));
+                Log.i("앱 목록",c.toString());
+                name = name + "\n" + c.toString();
+
+            }catch(Exception e) {
+                //Name Not FOund Exception
+            }
+        }
+        currentPlayingAppTxt.setText(name);
+
+        BroadcastReceiver headSetConnectReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+                int headSetState;
+                if (action.equals(intent.ACTION_HEADSET_PLUG)) {
+                    boolean isEarphoneOn = (intent.getIntExtra("state", 0) > 0) ? true : false;
+                    if (isEarphoneOn) {
+                        Log.e("일반 이어폰 log", "Earphone is plugged");
+                        normalEarphoneTxt.setText("Yes");
+                    } else {
+                        Log.e("일반 이어폰 log", "Earphone is unPlugged");
+                        normalEarphoneTxt.setText("No");
+                    }
+                } else if (intent.getAction().equals(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)) {
+                    headSetState = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, -1);
+                    Log.i("headSetState", Integer.toString(headSetState));
+                    if (headSetState == 0) {
+                        bluetoothEarphoneTxt.setText("No");
+                    } else if (headSetState == 1) {
+                        bluetoothEarphoneTxt.setText("연결중");
+                    } else {
+                        bluetoothEarphoneTxt.setText("Yes");
+                    }
+//                    int state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, -1);
+//                    switch(state) {
+//                        case BluetoothHeadset.STATE_AUDIO_CONNECTED :
+//                            Log.d("블루투스 이어폰 연결여부","연결됨");
+//                            break;
+//                        case BluetoothHeadset.STATE_AUDIO_DISCONNECTED :
+//                            Log.d("블루투스 이어폰 연결여부","안됨");
+//                            break;
+//                    }
+//                } else {
+//                    headSetState = intent.getExtras().getInt(BLUETOOTH_HEADSET_STATE);
+//
+//                    if (headSetState == 0) {
+//                        bluetoothEarphoneTxt.setText("No");
+//                    } else if (headSetState == 1) {
+//                        bluetoothEarphoneTxt.setText("연결중");
+//                    } else {
+//                        bluetoothEarphoneTxt.setText("Yes");
+//                    }
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
+            intentFilter.addAction(BLUETOOTH_HEADSET_ACTION);
+            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
+        } else {
+            intentFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
+            intentFilter.addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED);
+            intentFilter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
+            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
+        }
+
+        registerReceiver(headSetConnectReceiver, intentFilter);
+
+        //BluetoothReceiver bluetoothReceiver = new BluetoothReceiver(this);
+// BluetoothAdapter 인스턴스를 얻는다
+//        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+//        // 프로필 프록시에 연결한다
+//        mBluetoothAdapter.getProfileProxy(this, mProfileListener, BluetoothProfile.HEADSET);
+//        mBroadcastReceiver = new BroadcastReceiver() {
+//            private AudioManager localAudioManager;
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//
+//                localAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+//                //int systemVolume = audio.getStreamVolume(AudioManager.STREAM_SYSTEM);
+//
+//                boolean isEarphoneOn = (intent.getIntExtra("state", 0) > 0) ? true : false;
+//
+//                if (isEarphoneOn) {
+//                    Log.e("일반 이어폰 log", "Earphone is plugged");
+//                    normalEarphoneTxt.setText("Yes");
+//                } else {
+//                    Log.e("일반 이어폰 log", "Earphone is unPlugged");
+//                    normalEarphoneTxt.setText("No");
+//                }
+//            }
+//        };
+//        registerReceiver(mBroadcastReceiver, mIntentFilter);
+    }
+
+//    public boolean isNamedProcessRunning(String processName){
+//        if (processName == null)
+//            return false;
+//
+//        ActivityManager manager =
+//                (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+//        List<ActivityManager.RunningAppProcessInfo> processes = manager.getRunningAppProcesses();
+//        for (ActivityManager.RunningAppProcessInfo process : processes)
+//        {
+//            if (processName.equals(process.processName))
+//            {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
+//
+//
+//    private BluetoothProfile.ServiceListener mProfileListener = new BluetoothProfile.ServiceListener() {
+//        // 프로필 프록시와 연결되면 호출된다
+//        public void onServiceConnected(int profile, BluetoothProfile proxy) {
+//            if (profile == BluetoothProfile.HEADSET) {
+//                mBluetoothHeadset = (BluetoothHeadset) proxy;
+//                // 연결되어 있는 헤드셋 목록을 얻는다
+//              List<BluetoothDevice> connectedDevices = mBluetoothHeadset.getConnectedDevices();
+//                for (BluetoothDevice device : connectedDevices) {
+//                    device.getName();
+//                    device.getAddress();
+//                    device.getName();
+//                    Log.i("디바이스 정보",device.getName().toString() + " " + device.getAddress().toString() + " " + device.getName().toString());
+//                    mBluetoothHeadset.getConnectionState(device);
+//                    if (mBluetoothHeadset.isAudioConnected(device)) {
+//                        // 음성 전송 연결이 활성화되어 있다
+//                        bluetoothEarphoneTxt.setText("Yes");
+//                    }
+//                }
+//            }
+//        }
+//
+//        // 프로필 프록시와의 연결이 끊어지면 호출된다
+//        public void onServiceDisconnected(int profile) {
+//            if (profile == BluetoothProfile.HEADSET) {
+//                mBluetoothHeadset = null;
+//                bluetoothEarphoneTxt.setText("No");
+//            }
+//        }
+//    };
+
+}
