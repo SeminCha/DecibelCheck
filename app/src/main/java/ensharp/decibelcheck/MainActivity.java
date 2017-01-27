@@ -14,7 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothHeadset mBluetoothHeadset;
 
+    private Button serviceBtn;
+    public boolean isServiceOn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,9 +49,29 @@ public class MainActivity extends AppCompatActivity {
         bluetoothEarphoneTxt = (TextView) findViewById(R.id.bluetoothTxt);
         musicOnTxt = (TextView) findViewById(R.id.musicOnTxt);
         currentPlayingAppTxt = (TextView) findViewById(R.id.currentPlayingAppTxt);
+        serviceBtn = (Button) findViewById(R.id.serviceBtn);
+        final ServiceThread thread = new ServiceThread();
+
         String name = "목록 ";
         int count = 0;
 
+        serviceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(serviceBtn.getText().toString().equals("서비스 시작")) {
+                    Log.i("isRun여부","true로 통과");
+                    //Toast.makeText(getApplicationContext(),"서비스 시작",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, MainService.class);
+                    serviceBtn.setText("서비스 종료");
+                    startService(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(),"서비스 종료",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, MainService.class);
+                    serviceBtn.setText("서비스 시작");
+                    stopService(intent);
+                }
+            }
+        });
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         if (manager.isMusicActive()) {
             musicOnTxt.setText("Yes");
@@ -53,18 +79,18 @@ public class MainActivity extends AppCompatActivity {
             musicOnTxt.setText("No");
         }
 
-        ActivityManager am = (ActivityManager)this.getSystemService(ACTIVITY_SERVICE);
+        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         List l = am.getRunningAppProcesses();
         Iterator i = l.iterator();
         PackageManager pm = this.getPackageManager();
-        while(i.hasNext()) {
-            ActivityManager.RunningAppProcessInfo info = (ActivityManager.RunningAppProcessInfo)(i.next());
+        while (i.hasNext()) {
+            ActivityManager.RunningAppProcessInfo info = (ActivityManager.RunningAppProcessInfo) (i.next());
             try {
                 CharSequence c = pm.getApplicationLabel(pm.getApplicationInfo(info.processName, PackageManager.GET_META_DATA));
-                Log.i("앱 목록",c.toString());
+                Log.i("앱 목록", c.toString());
                 name = name + "\n" + c.toString();
 
-            }catch(Exception e) {
+            } catch (Exception e) {
                 //Name Not FOund Exception
             }
         }
