@@ -107,8 +107,16 @@ public class MainService extends Service {
                 case SEND_THREAD_NORMALEARPHONE_UNPLUGGED :
                     MainActivity.setMainUiText("이어폰","X");
                     break;
+
+                case SEND_THREAD_BLUETOOTHEARPHONE_CONNECTED :
+                    MainActivity.setMainUiText("블루투스 이어폰","O");
+                    break;
+
+                case SEND_THREAD_BLUETOOTHEARPHONE_UNCONNECTED :
+                    MainActivity.setMainUiText("블루투스 이어폰","X");
+                    break;
             }
-            //Toast.makeText(MainService.this, "서비스 시작", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainService.this, "서비스 시작", Toast.LENGTH_SHORT).show();
         }
     }
 

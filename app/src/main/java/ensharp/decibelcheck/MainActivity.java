@@ -18,7 +18,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     public static TextView normalEarphoneTxt;
-    public TextView bluetoothEarphoneTxt;
+    public static TextView bluetoothEarphoneTxt;
     public TextView musicOnTxt;
     public TextView currentPlayingAppTxt;
 
@@ -140,6 +140,12 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("메인으로 넘어온 값", textContent + "?");
                 if(normalEarphoneTxt != null) {
                     normalEarphoneTxt.setText(textContent);
+                }
+                break;
+            case "블루투스 이어폰" :
+                Log.i("메인으로 넘어온 값", textContent + "?");
+                if(bluetoothEarphoneTxt != null) {
+                    bluetoothEarphoneTxt.setText(textContent);
                 }
                 break;
         }
