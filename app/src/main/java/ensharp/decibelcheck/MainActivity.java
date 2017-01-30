@@ -1,16 +1,12 @@
 package ensharp.decibelcheck;
 
-import android.app.ActivityManager;
-import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,12 +15,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Iterator;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
 
-    public TextView normalEarphoneTxt;
+    public static TextView normalEarphoneTxt;
     public TextView bluetoothEarphoneTxt;
     public TextView musicOnTxt;
     public TextView currentPlayingAppTxt;
@@ -39,39 +32,57 @@ public class MainActivity extends AppCompatActivity {
 
     private Button serviceBtn;
     public boolean isServiceOn;
+    public SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.i("처음부터 시작", "onCreate 실행");
         normalEarphoneTxt = (TextView) findViewById(R.id.earphoneTxt);
         bluetoothEarphoneTxt = (TextView) findViewById(R.id.bluetoothTxt);
         musicOnTxt = (TextView) findViewById(R.id.musicOnTxt);
         currentPlayingAppTxt = (TextView) findViewById(R.id.currentPlayingAppTxt);
         serviceBtn = (Button) findViewById(R.id.serviceBtn);
         final ServiceThread thread = new ServiceThread();
+        pref = new SharedPreferences(this);
 
-        String name = "목록 ";
-        int count = 0;
+        Toast.makeText(this, "onCreate 실행", Toast.LENGTH_SHORT).show();
+        if (pref.getValue("0", false, "normalEarphone")) {
+            normalEarphoneTxt.setText("O");
+        } else {
+            normalEarphoneTxt.setText("X");
+        }
 
+        if (pref.getValue("0", false, "bluetoothEarphone")) {
+            bluetoothEarphoneTxt.setText("O");
+        } else {
+            bluetoothEarphoneTxt.setText("X");
+        }
+
+        if (pref.getValue("0", false, "service")) {
+            serviceBtn.setText("서비스 종료");
+        } else {
+            serviceBtn.setText("서비스 시작");
+        }
         serviceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(serviceBtn.getText().toString().equals("서비스 시작")) {
-                    Log.i("isRun여부","true로 통과");
+                if (!pref.getValue("0", false, "service")) {
+                    Log.i("isRun여부", "true로 통과");
                     //Toast.makeText(getApplicationContext(),"서비스 시작",Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, MainService.class);
                     serviceBtn.setText("서비스 종료");
                     startService(intent);
                 } else {
-                    Toast.makeText(getApplicationContext(),"서비스 종료",Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "서비스 종료", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, MainService.class);
                     serviceBtn.setText("서비스 시작");
                     stopService(intent);
                 }
             }
         });
+
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         if (manager.isMusicActive()) {
             musicOnTxt.setText("Yes");
@@ -79,59 +90,23 @@ public class MainActivity extends AppCompatActivity {
             musicOnTxt.setText("No");
         }
 
-        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
-        List l = am.getRunningAppProcesses();
-        Iterator i = l.iterator();
-        PackageManager pm = this.getPackageManager();
-        while (i.hasNext()) {
-            ActivityManager.RunningAppProcessInfo info = (ActivityManager.RunningAppProcessInfo) (i.next());
-            try {
-                CharSequence c = pm.getApplicationLabel(pm.getApplicationInfo(info.processName, PackageManager.GET_META_DATA));
-                Log.i("앱 목록", c.toString());
-                name = name + "\n" + c.toString();
-
-            } catch (Exception e) {
-                //Name Not FOund Exception
-            }
-        }
-        currentPlayingAppTxt.setText(name);
-
-        BroadcastReceiver headSetConnectReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                final String action = intent.getAction();
-                int headSetState;
-                if (action.equals(intent.ACTION_HEADSET_PLUG)) {
-                    boolean isEarphoneOn = (intent.getIntExtra("state", 0) > 0) ? true : false;
-                    if (isEarphoneOn) {
-                        Log.e("일반 이어폰 log", "Earphone is plugged");
-                        normalEarphoneTxt.setText("Yes");
-                    } else {
-                        Log.e("일반 이어폰 log", "Earphone is unPlugged");
-                        normalEarphoneTxt.setText("No");
-                    }
-                } else if (intent.getAction().equals(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)) {
-                    headSetState = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, -1);
-                    Log.i("headSetState", Integer.toString(headSetState));
-                    if (headSetState == 0) {
-                        bluetoothEarphoneTxt.setText("No");
-                    } else if (headSetState == 1) {
-                        bluetoothEarphoneTxt.setText("연결중");
-                    } else {
-                        bluetoothEarphoneTxt.setText("Yes");
-                    }
-//                    int state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, -1);
-//                    switch(state) {
-//                        case BluetoothHeadset.STATE_AUDIO_CONNECTED :
-//                            Log.d("블루투스 이어폰 연결여부","연결됨");
-//                            break;
-//                        case BluetoothHeadset.STATE_AUDIO_DISCONNECTED :
-//                            Log.d("블루투스 이어폰 연결여부","안됨");
-//                            break;
+//        BroadcastReceiver headSetConnectReceiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                final String action = intent.getAction();
+//                int headSetState;
+//                if (action.equals(intent.ACTION_HEADSET_PLUG)) {
+//                    boolean isEarphoneOn = (intent.getIntExtra("state", 0) > 0) ? true : false;
+//                    if (isEarphoneOn) {
+//                        Log.e("일반 이어폰 log", "Earphone is plugged");
+//                        normalEarphoneTxt.setText("Yes");
+//                    } else {
+//                        Log.e("일반 이어폰 log", "Earphone is unPlugged");
+//                        normalEarphoneTxt.setText("No");
 //                    }
-//                } else {
-//                    headSetState = intent.getExtras().getInt(BLUETOOTH_HEADSET_STATE);
-//
+//                } else if (intent.getAction().equals(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)) {
+//                    headSetState = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, -1);
+//                    Log.i("headSetState", Integer.toString(headSetState));
 //                    if (headSetState == 0) {
 //                        bluetoothEarphoneTxt.setText("No");
 //                    } else if (headSetState == 1) {
@@ -139,23 +114,42 @@ public class MainActivity extends AppCompatActivity {
 //                    } else {
 //                        bluetoothEarphoneTxt.setText("Yes");
 //                    }
+//                }
+//            }
+//        };
+
+//        IntentFilter intentFilter = new IntentFilter();
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
+//            intentFilter.addAction(BLUETOOTH_HEADSET_ACTION);
+//            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
+//        } else {
+//            intentFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
+//            intentFilter.addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED);
+//            intentFilter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
+//            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
+//        }
+//
+//        registerReceiver(headSetConnectReceiver, intentFilter);
+    }
+
+
+    public static void setMainUiText(String textName, String textContent) {
+        switch(textName) {
+
+            case "이어폰" :
+                Log.i("메인으로 넘어온 값", textContent + "?");
+                if(normalEarphoneTxt != null) {
+                    normalEarphoneTxt.setText(textContent);
                 }
-            }
-        };
-
-        IntentFilter intentFilter = new IntentFilter();
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
-            intentFilter.addAction(BLUETOOTH_HEADSET_ACTION);
-            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
-        } else {
-            intentFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
-            intentFilter.addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED);
-            intentFilter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
-            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
+                break;
         }
+    }
 
-        registerReceiver(headSetConnectReceiver, intentFilter);
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Toast.makeText(this, "onResume 실행", Toast.LENGTH_SHORT).show();
+    }
         //BluetoothReceiver bluetoothReceiver = new BluetoothReceiver(this);
 // BluetoothAdapter 인스턴스를 얻는다
 //        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -181,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        };
 //        registerReceiver(mBroadcastReceiver, mIntentFilter);
-    }
+
 
 //    public boolean isNamedProcessRunning(String processName){
 //        if (processName == null)
@@ -232,4 +226,20 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //    };
 
+    //        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+//        List l = am.getRunningAppProcesses();
+//        Iterator i = l.iterator();
+//        PackageManager pm = this.getPackageManager();
+//        while (i.hasNext()) {
+//            ActivityManager.RunningAppProcessInfo info = (ActivityManager.RunningAppProcessInfo) (i.next());
+//            try {
+//                CharSequence c = pm.getApplicationLabel(pm.getApplicationInfo(info.processName, PackageManager.GET_META_DATA));
+//                Log.i("앱 목록", c.toString());
+//                name = name + "\n" + c.toString();
+//
+//            } catch (Exception e) {
+//                //Name Not FOund Exception
+//            }
+//        }
+//        currentPlayingAppTxt.setText(name);
 }
