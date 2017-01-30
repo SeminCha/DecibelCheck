@@ -61,11 +61,11 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
-//        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-//                       audioFocusGranted
-//        } else if (result == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
-//            mState.audioFocusGranted = false;
-//        }
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.e("오디오 포커스 결과", "획득");
+        } else if (result == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
+            Log.e("오디오 포커스 결과", "획득실패");
+        }
     }
 
     public void stopRunning() {
@@ -144,6 +144,19 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
 
     @Override
     public void onAudioFocusChange(int focusChange) {
-
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                Log.e("오디오 포커스 변화", "GAIN");
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+                Log.e("오디오 포커스 변화", "LOSS");
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                Log.e("오디오 포커스 변화", "LOSS_TRANSTENT");
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                Log.e("오디오 포커스 변화", "LOSS_TRANSIENT_CAN_DUCK");
+                break;
+        }
     }
 }
