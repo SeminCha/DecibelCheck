@@ -8,10 +8,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.util.List;
@@ -25,6 +28,7 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
     Context context;
     boolean isRun;
     IntentFilter intentFilter;
+    IntentFilter intentFilter_music;
     Message msg;
     public SharedPreferences pref;
     private static final String BLUETOOTH_HEADSET_ACTION = "android.bluetooth.headset.action.STATE_CHANGED";
@@ -62,6 +66,24 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
             intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
         }
 
+        intentFilter_music = new IntentFilter();
+        //intentFilter_music.addAction("com.sec.android.app.music.metachanged");
+       ;
+        intentFilter_music.addAction("com.android.music.playstatechanged");
+        intentFilter_music.addAction("com.htc.music.playstatechanged");
+        intentFilter_music.addAction("fm.last.android.playstatechanged");
+        intentFilter_music.addAction("com.sec.android.app.music.playstatechanged");
+        intentFilter_music.addAction("com.nullsoft.winamp.playstatechanged");
+        intentFilter_music.addAction("com.amazon.mp3.playstatechanged");
+        intentFilter_music.addAction("com.miui.player.playstatechanged");
+        intentFilter_music.addAction("com.real.IMP.playstatechanged");
+        intentFilter_music.addAction("com.sonyericsson.music.playstatechanged");
+        intentFilter_music.addAction("com.rdio.android.playstatechanged");
+        intentFilter_music.addAction("com.samsung.sec.android.MusicPlayer.playstatechanged");
+        intentFilter_music.addAction("com.andrew.apollo.playstatechanged");
+        intentFilter_music.addAction("gonemad.dashclock.music.playstatechanged");
+        intentFilter_music.addAction("com.piratemedia.musicmod.playstatechanged");
+
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
@@ -76,12 +98,15 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
         synchronized (this) {
             Log.i("서비스 중지", "stopRunning");
             context.unregisterReceiver(headSetConnectReceiver);
+            context.unregisterReceiver(mReceiver);
             this.isRun = false;
         }
     }
 
     public void run() {
         context.registerReceiver(headSetConnectReceiver, intentFilter, null, handler);
+        context.registerReceiver(mReceiver, intentFilter_music, null, handler);
+
         if (isRun) {
             Log.i("서비스 run", "sendEmptyMessage");
             handler.sendEmptyMessage(SEND_THREAD_START_MESSAGE);
@@ -91,6 +116,36 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
             }
         }
     }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String cmd = intent.getStringExtra("command");
+            Log.v("tag ", action + " / " + cmd);
+            String all = intent.getScheme();
+            String artists = intent.getStringExtra("artist");
+            String album = intent.getStringExtra("album");
+            String track = intent.getStringExtra("track");
+            Log.v("tag", all + "*******" + artists + "********" + track + "********" + album);
+            Uri mAudioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            String selection = MediaStore.Audio.Media.TITLE + " == \"" + intent.getStringExtra("track") + "\"";
+            String artist = intent.getStringExtra("artist");
+            String fullpath = "없음";
+            String[] STAR = {"*"};
+            Cursor cursor = context.getContentResolver().query(mAudioUri, STAR, selection, null, null);
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                if (cursor.getColumnIndex(MediaStore.Audio.Media.TITLE) != -1) {
+                    fullpath = cursor.getString(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.DATA));
+
+                }
+            }
+            Log.e("노래경로", "노래경로 : " + fullpath + "****** 가수 : " + artist + "****** 제목 : " + selection);
+        }
+    };
 
     BroadcastReceiver headSetConnectReceiver = new BroadcastReceiver() {
         @Override
@@ -154,9 +209,9 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 Log.e("오디오 포커스 변화", "LOSS");
-                serviceList();
-                processList();
-                runningList();
+//                serviceList();
+//                processList();
+//                runningList();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 Log.e("오디오 포커스 변화", "LOSS_TRANSTENT");
@@ -167,38 +222,37 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
         }
     }
 
-    private void serviceList(){
+    private void serviceList() {
         /* 실행중인 service 목록 보기 */
-        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningServiceInfo> rs = am.getRunningServices(50);
 
-        for(int i=0; i<rs.size(); i++){
+        for (int i = 0; i < rs.size(); i++) {
             ActivityManager.RunningServiceInfo rsi = rs.get(i);
-            Log.d("run service","Package Name : " + rsi.service.getPackageName());
+            Log.d("run service", "Package Name : " + rsi.service.getPackageName());
         }
 
     }
 
-    private void processList(){
+    private void processList() {
         /* 실행중인 process 목록 보기*/
-        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> appList = am.getRunningAppProcesses();
 
-        for(int i=0; i<appList.size(); i++){
+        for (int i = 0; i < appList.size(); i++) {
             ActivityManager.RunningAppProcessInfo rapi = appList.get(i);
-            Log.d("run Process","Package Name : " + rapi.processName);
+            Log.d("run Process", "Package Name : " + rapi.processName);
         }
 
     }
 
-    private void runningList(){
+    private void runningList() {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 
 
-
         // get the info from the currently running task
-        List< ActivityManager.RunningTaskInfo > taskInfo = am.getRunningTasks(1);
-        for(int i=0; i<taskInfo.size(); i++) {
+        List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+        for (int i = 0; i < taskInfo.size(); i++) {
             Log.d("topActivity", "CURRENT Activity ::"
                     + taskInfo.get(0).topActivity.getClassName());
 
