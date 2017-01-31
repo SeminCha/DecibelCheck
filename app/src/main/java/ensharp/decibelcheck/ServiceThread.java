@@ -1,8 +1,10 @@
 package ensharp.decibelcheck;
 
+import android.app.ActivityManager;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,6 +13,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
+import java.util.List;
 
 /**
  * Created by Semin on 2017-01-27.
@@ -150,6 +154,9 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 Log.e("오디오 포커스 변화", "LOSS");
+                serviceList();
+                processList();
+                runningList();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 Log.e("오디오 포커스 변화", "LOSS_TRANSTENT");
@@ -159,4 +166,47 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
                 break;
         }
     }
+
+    private void serviceList(){
+        /* 실행중인 service 목록 보기 */
+        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> rs = am.getRunningServices(50);
+
+        for(int i=0; i<rs.size(); i++){
+            ActivityManager.RunningServiceInfo rsi = rs.get(i);
+            Log.d("run service","Package Name : " + rsi.service.getPackageName());
+        }
+
+    }
+
+    private void processList(){
+        /* 실행중인 process 목록 보기*/
+        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appList = am.getRunningAppProcesses();
+
+        for(int i=0; i<appList.size(); i++){
+            ActivityManager.RunningAppProcessInfo rapi = appList.get(i);
+            Log.d("run Process","Package Name : " + rapi.processName);
+        }
+
+    }
+
+    private void runningList(){
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+
+
+        // get the info from the currently running task
+        List< ActivityManager.RunningTaskInfo > taskInfo = am.getRunningTasks(1);
+        for(int i=0; i<taskInfo.size(); i++) {
+            Log.d("topActivity", "CURRENT Activity ::"
+                    + taskInfo.get(0).topActivity.getClassName());
+
+            ComponentName componentInfo = taskInfo.get(0).topActivity;
+            Log.d("topActivity", "CURRENT Package ::"
+                    + componentInfo.getPackageName());
+        }
+    }
+
+
 }

@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
         serviceBtn = (Button) findViewById(R.id.serviceBtn);
         final ServiceThread thread = new ServiceThread();
         pref = new SharedPreferences(this);
-
+        Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        startActivityForResult(intent, 0);
         Toast.makeText(this, "onCreate 실행", Toast.LENGTH_SHORT).show();
         if (pref.getValue("0", false, "normalEarphone")) {
             normalEarphoneTxt.setText("O");
