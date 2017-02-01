@@ -68,7 +68,6 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
 
         intentFilter_music = new IntentFilter();
         //intentFilter_music.addAction("com.sec.android.app.music.metachanged");
-       ;
         intentFilter_music.addAction("com.android.music.playstatechanged");
         intentFilter_music.addAction("com.htc.music.playstatechanged");
         intentFilter_music.addAction("fm.last.android.playstatechanged");

@@ -39,18 +39,6 @@ public class MainService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("서비스 onStartCommand","mainservice여기 옴");
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        IntentFilter intentFilter = new IntentFilter();
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
-//            intentFilter.addAction(BLUETOOTH_HEADSET_ACTION);
-//            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
-//        } else {
-//            intentFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
-//            intentFilter.addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED);
-//            intentFilter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
-//            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
-//        }
-//
-//        registerReceiver(headSetConnectReceiver, intentFilter);
         myServiceHandler handler = new myServiceHandler();
         thread = new ServiceThread(handler, this);
         thread.setIsServiceRun(true);
