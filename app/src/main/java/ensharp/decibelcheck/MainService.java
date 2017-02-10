@@ -111,46 +111,6 @@ public class MainService extends Service {
                     break;
 
             }
-            //Toast.makeText(MainService.this, "서비스 시작", Toast.LENGTH_SHORT).show();
         }
     }
-
-
-//    BroadcastReceiver headSetConnectReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            final String action = intent.getAction();
-//            int headSetState;
-//            if (action.equals(intent.ACTION_HEADSET_PLUG)) {
-//                boolean isEarphoneOn = (intent.getIntExtra("state", 0) > 0) ? true : false;
-//                if (isEarphoneOn) {
-//                    Log.e("일반 이어폰 log", "Earphone is plugged");
-//                    pref.putValue("0",true,"normalEarphone");
-//                    //normalEarphoneTxt.setText("Yes");
-//                } else {
-//                    Log.e("일반 이어폰 log", "Earphone is unPlugged");
-//                    pref.putValue("0",false,"normalEarphone");
-//                    //normalEarphoneTxt.setText("No");
-//                }
-//            } else if (intent.getAction().equals(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)) {
-//                headSetState = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, -1);
-//                Log.i("headSetState", Integer.toString(headSetState));
-//                if (headSetState == 0) {
-//                    Log.e("블루투스 이어폰 log", "Earphone is unplugged");
-//                    pref.putValue("0",false,"bluetoothEarphone");
-//                    //bluetoothEarphoneTxt.setText("No");
-//                } else if (headSetState == 1) {
-//                    Log.e("블루투스 이어폰 log", "Earphone is plugging");
-//                    pref.putValue("0",false,"bluetoothEarphone");
-//                    //bluetoothEarphoneTxt.setText("연결중");
-//                } else {
-//                    Log.e("블루투스 이어폰 log", "Earphone is plugged");
-//                    pref.putValue("0",true,"bluetoothEarphone");
-//                    //bluetoothEarphoneTxt.setText("Yes");
-//                }
-//            }
-//        }
-//    };
-
-
 }
