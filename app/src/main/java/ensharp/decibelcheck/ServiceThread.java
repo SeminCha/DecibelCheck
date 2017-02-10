@@ -108,7 +108,7 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
 
     public void run() {
         //context.registerReceiver(headSetConnectReceiver, intentFilter, null, handler);
-        context.registerReceiver(mReceiver, intentFilter_music, null, handler);
+        //context.registerReceiver(mReceiver, intentFilter_music, null, handler);
 
         if (isRun) {
             Log.i("서비스 run", "sendEmptyMessage");

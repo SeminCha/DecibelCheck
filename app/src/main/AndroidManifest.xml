@@ -41,6 +41,13 @@
                 <action android:name="android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".MusicBroadcastReceiver">
+            <intent-filter>
+                <!-- Default android -->
+                <action android:name="com.android.music.metachanged" />
+                <action android:name="com.android.music.playstatechanged" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
