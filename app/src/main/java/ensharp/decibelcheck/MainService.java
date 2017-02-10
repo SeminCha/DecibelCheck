@@ -16,7 +16,7 @@ public class MainService extends Service {
     NotificationManager notificationManager;
     ServiceThread thread;
     Notification notification;
-
+    myServiceHandler handler;
     private static final String BLUETOOTH_HEADSET_ACTION = "android.bluetooth.headset.action.STATE_CHANGED";
     public SharedPreferences pref;
     private static final int SEND_THREAD_START_MESSAGE = 0;
@@ -25,6 +25,7 @@ public class MainService extends Service {
     private static final int SEND_THREAD_NORMALEARPHONE_UNPLUGGED = 3;
     private static final int SEND_THREAD_BLUETOOTHEARPHONE_CONNECTED = 4;
     private static final int SEND_THREAD_BLUETOOTHEARPHONE_UNCONNECTED = 5;
+    private static final int SEND_MUSIC_INFORMATION= 6;
 
     public MainService() {
     }
@@ -39,7 +40,7 @@ public class MainService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("서비스 onStartCommand","mainservice여기 옴");
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        myServiceHandler handler = new myServiceHandler();
+        handler = new myServiceHandler();
         thread = new ServiceThread(handler, this);
         thread.setIsServiceRun(true);
         thread.start();
@@ -103,6 +104,12 @@ public class MainService extends Service {
                 case SEND_THREAD_BLUETOOTHEARPHONE_UNCONNECTED :
                     MainActivity.setMainUiText("블루투스 이어폰","X");
                     break;
+
+                case SEND_MUSIC_INFORMATION :
+                    Log.i("핸들러에서의 스트링값",msg.obj.toString());
+                    MainActivity.setMainUiText("음악 재생 정보", msg.obj.toString());
+                    break;
+
             }
             Toast.makeText(MainService.this, "서비스 시작", Toast.LENGTH_SHORT).show();
         }

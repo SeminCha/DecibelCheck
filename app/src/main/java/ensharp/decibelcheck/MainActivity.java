@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
 
     public static TextView earphoneTxt;
     public static TextView bluetoothEarphoneTxt;
-    public TextView musicOnTxt;
+    public static TextView musicOnTxt;
     public TextView currentPlayingAppTxt;
 
     private static final String BLUETOOTH_HEADSET_ACTION = "android.bluetooth.headset.action.STATE_CHANGED";
@@ -90,6 +90,8 @@ public class MainActivity extends Activity {
             serviceBtn.setText("서비스 시작");
             Log.i("서비스 러닝여부","X");
         }
+
+       musicOnTxt.setText(pref.getValue("0", "없음", "음악 재생 정보"));
     }
 
 
@@ -115,6 +117,12 @@ public class MainActivity extends Activity {
                     }
                 }
                 break;
+
+            case "음악 재생 정보" :
+                Log.i("메인으로 넘어온 값", textContent + "?");
+                if(musicOnTxt != null) {
+                    musicOnTxt.setText(textContent);
+                }
         }
     }
 

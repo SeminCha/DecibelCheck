@@ -1,10 +1,8 @@
 package ensharp.decibelcheck;
 
-import android.app.ActivityManager;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,12 +10,14 @@ import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Semin on 2017-01-27.
@@ -31,6 +31,7 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
     IntentFilter intentFilter_music;
     Message msg;
     public SharedPreferences pref;
+    MusicAccessibilityService musicAccessibilityService;
     private static final String BLUETOOTH_HEADSET_ACTION = "android.bluetooth.headset.action.STATE_CHANGED";
     private static final int SEND_THREAD_START_MESSAGE = 0;
     private static final int SEND_THREAD_STOP_MESSAGE = 1;
@@ -38,6 +39,7 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
     private static final int SEND_THREAD_NORMALEARPHONE_UNPLUGGED = 3;
     private static final int SEND_THREAD_BLUETOOTHEARPHONE_CONNECTED = 4;
     private static final int SEND_THREAD_BLUETOOTHEARPHONE_UNCONNECTED = 5;
+    private static final int SEND_MUSIC_INFORMATION = 6;
     AudioManager audioManager;
 
     public ServiceThread() {
@@ -55,6 +57,7 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
         this.handler = handler;
         this.context = context;
         pref = new SharedPreferences(context);
+        musicAccessibilityService = new MusicAccessibilityService();
         intentFilter = new IntentFilter();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
             intentFilter.addAction(BLUETOOTH_HEADSET_ACTION);
@@ -68,7 +71,10 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
 
         intentFilter_music = new IntentFilter();
         //intentFilter_music.addAction("com.sec.android.app.music.metachanged");
+        intentFilter_music.addAction("com.android.music.metachanged");
         intentFilter_music.addAction("com.android.music.playstatechanged");
+        intentFilter_music.addAction("com.android.music.playbackcomplete");
+        intentFilter_music.addAction("com.android.music.queuechanged");
         intentFilter_music.addAction("com.htc.music.playstatechanged");
         intentFilter_music.addAction("fm.last.android.playstatechanged");
         intentFilter_music.addAction("com.sec.android.app.music.playstatechanged");
@@ -91,6 +97,13 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
         } else if (result == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
             Log.e("오디오 포커스 결과", "획득실패");
         }
+    }
+
+    public String convertDuration(long millis) {
+        String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+        return hms;
     }
 
     public void stopRunning() {
@@ -124,14 +137,32 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
             String cmd = intent.getStringExtra("command");
             Log.v("tag ", action + " / " + cmd);
             String all = intent.getScheme();
+            Set<String> keys = intent.getExtras().keySet();
+            Bundle bundle = intent.getExtras();
+            for (String key : bundle.keySet()) {
+                Object value = bundle.get(key);
+                Log.d("인텐트키정보", String.format("%s %s (%s)", key,
+                        value.toString(), value.getClass().getName()));
+            }
+            Long trackLength = intent.getExtras().getLong("trackLength");
+            Long position = intent.getExtras().getLong("position");
+            boolean isplaying = intent.getExtras().getBoolean("playing");
+//            String artists = intent.getStringExtra("artist");
+//            String album = intent.getStringExtra("album");
+//            String track = intent.getStringExtra("track");
+//            String duration = intent.getStringExtra("duration");
+//            String bookmark = intent.getStringExtra("bookmark");
             String artists = intent.getStringExtra("artist");
             String album = intent.getStringExtra("album");
             String track = intent.getStringExtra("track");
-            Log.v("tag", all + "*******" + artists + "********" + track + "********" + album);
+            Log.e("음악정보", "가수 : " + artists + " / 제목 : " + track + " / 음악길이 : " + convertDuration(trackLength) + " / 포지션 : " + convertDuration(position));
+
+            //Log.v("tag", all + " / " + artists + " / " + track + "********" + album);
+            msg = handler.obtainMessage();
             Uri mAudioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             String selection = MediaStore.Audio.Media.TITLE + " == \"" + intent.getStringExtra("track") + "\"";
             String artist = intent.getStringExtra("artist");
-            String fullpath = "없음";
+            String fullpath = "스트리밍 음원이므로 없음";
             String[] STAR = {"*"};
             Cursor cursor = context.getContentResolver().query(mAudioUri, STAR, selection, null, null);
             if (cursor != null && cursor.getCount() > 0) {
@@ -139,12 +170,38 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
                 if (cursor.getColumnIndex(MediaStore.Audio.Media.TITLE) != -1) {
                     fullpath = cursor.getString(cursor
                             .getColumnIndex(MediaStore.Audio.Media.DATA));
+                    artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+
 
                 }
             }
             Log.e("노래경로", "노래경로 : " + fullpath + "****** 가수 : " + artist + "****** 제목 : " + selection);
+            AudioManager manager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
+
+            if(manager.isMusicActive()) {
+                msg.what = SEND_MUSIC_INFORMATION;
+                String appname = musicAccessibilityService.packageName;
+                String musicInfo = new String("가수 : " + artist + "\n" + "제목 : " + intent.getStringExtra("track") + "\n" + "음원저장경로 : " + fullpath + "\n" + "앱명 : " + appname);
+                msg.obj = musicInfo;
+                handler.sendMessage(msg);
+                pref.putValue("0",musicInfo,"음악 재생 정보");
+                Log.e("음악재생여부", "재생중");
+            } else {
+                msg.what = SEND_MUSIC_INFORMATION;
+                String musicInfo = new String("없음");
+                msg.obj = musicInfo;
+                handler.sendMessage(msg);
+                pref.putValue("0",musicInfo,"음악 재생 정보");
+                Log.e("음악재생여부", "일시정지");
+            }
         }
     };
+
+    public String getRunningPackageName() {
+        String appName = "인식불가";
+        return appName;
+    }
+
 
     BroadcastReceiver headSetConnectReceiver = new BroadcastReceiver() {
         @Override
@@ -208,9 +265,6 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 Log.e("오디오 포커스 변화", "LOSS");
-//                serviceList();
-//                processList();
-//                runningList();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 Log.e("오디오 포커스 변화", "LOSS_TRANSTENT");
@@ -220,46 +274,4 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
                 break;
         }
     }
-
-    private void serviceList() {
-        /* 실행중인 service 목록 보기 */
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningServiceInfo> rs = am.getRunningServices(50);
-
-        for (int i = 0; i < rs.size(); i++) {
-            ActivityManager.RunningServiceInfo rsi = rs.get(i);
-            Log.d("run service", "Package Name : " + rsi.service.getPackageName());
-        }
-
-    }
-
-    private void processList() {
-        /* 실행중인 process 목록 보기*/
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> appList = am.getRunningAppProcesses();
-
-        for (int i = 0; i < appList.size(); i++) {
-            ActivityManager.RunningAppProcessInfo rapi = appList.get(i);
-            Log.d("run Process", "Package Name : " + rapi.processName);
-        }
-
-    }
-
-    private void runningList() {
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-
-
-        // get the info from the currently running task
-        List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-        for (int i = 0; i < taskInfo.size(); i++) {
-            Log.d("topActivity", "CURRENT Activity ::"
-                    + taskInfo.get(0).topActivity.getClassName());
-
-            ComponentName componentInfo = taskInfo.get(0).topActivity;
-            Log.d("topActivity", "CURRENT Package ::"
-                    + componentInfo.getPackageName());
-        }
-    }
-
-
 }
