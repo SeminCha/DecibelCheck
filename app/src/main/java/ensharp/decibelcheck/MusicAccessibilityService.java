@@ -12,11 +12,12 @@ import android.view.accessibility.AccessibilityEvent;
 public class MusicAccessibilityService extends AccessibilityService{
     static final String TAG = "출력값";
     static String packageName = "없음";
+    public SharedPreferences pref;
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-
+        pref = new SharedPreferences(this);
         //Configure these here for compatibility with API 13 and below.
         AccessibilityServiceInfo config = new AccessibilityServiceInfo();
         config.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
@@ -54,15 +55,12 @@ public class MusicAccessibilityService extends AccessibilityService{
 
             case "com.sec.android.app.music" :
                 packageName = event.getPackageName().toString();
-
                 break;
             case "com.nhn.android.music" :
                 packageName = event.getPackageName().toString();
-
                 break;
             case "com.iloen.melon" :
                 packageName = event.getPackageName().toString();
-
                 break;
 
             default : break;

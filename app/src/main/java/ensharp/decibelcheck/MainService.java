@@ -111,7 +111,7 @@ public class MainService extends Service {
                     break;
 
             }
-            Toast.makeText(MainService.this, "서비스 시작", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainService.this, "서비스 시작", Toast.LENGTH_SHORT).show();
         }
     }
 

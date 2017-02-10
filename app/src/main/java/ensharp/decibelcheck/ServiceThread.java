@@ -1,6 +1,5 @@
 package ensharp.decibelcheck;
 
-import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -59,15 +57,8 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
         pref = new SharedPreferences(context);
         musicAccessibilityService = new MusicAccessibilityService();
         intentFilter = new IntentFilter();
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR2) {
-            intentFilter.addAction(BLUETOOTH_HEADSET_ACTION);
-            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
-        } else {
-            intentFilter.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
-            intentFilter.addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED);
-            intentFilter.addAction(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
-            intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
-        }
+        intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
+
 
         intentFilter_music = new IntentFilter();
         //intentFilter_music.addAction("com.sec.android.app.music.metachanged");
@@ -116,7 +107,7 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
     }
 
     public void run() {
-        context.registerReceiver(headSetConnectReceiver, intentFilter, null, handler);
+        //context.registerReceiver(headSetConnectReceiver, intentFilter, null, handler);
         context.registerReceiver(mReceiver, intentFilter_music, null, handler);
 
         if (isRun) {
@@ -178,20 +169,20 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
             Log.e("노래경로", "노래경로 : " + fullpath + "****** 가수 : " + artist + "****** 제목 : " + selection);
             AudioManager manager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
 
-            if(manager.isMusicActive()) {
+            if (manager.isMusicActive()) {
                 msg.what = SEND_MUSIC_INFORMATION;
                 String appname = musicAccessibilityService.packageName;
                 String musicInfo = new String("가수 : " + artist + "\n" + "제목 : " + intent.getStringExtra("track") + "\n" + "음원저장경로 : " + fullpath + "\n" + "앱명 : " + appname);
                 msg.obj = musicInfo;
                 handler.sendMessage(msg);
-                pref.putValue("0",musicInfo,"음악 재생 정보");
+                pref.putValue("0", musicInfo, "음악 재생 정보");
                 Log.e("음악재생여부", "재생중");
             } else {
                 msg.what = SEND_MUSIC_INFORMATION;
                 String musicInfo = new String("없음");
                 msg.obj = musicInfo;
                 handler.sendMessage(msg);
-                pref.putValue("0",musicInfo,"음악 재생 정보");
+                pref.putValue("0", musicInfo, "음악 재생 정보");
                 Log.e("음악재생여부", "일시정지");
             }
         }

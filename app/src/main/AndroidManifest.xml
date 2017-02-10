@@ -35,6 +35,12 @@
                 android:name="android.accessibliityservice"
                 android:resource="@xml/accessibillity_service_config" />
         </service>
+        <receiver android:name=".HeadsetBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.bluetooth.headset.action.STATE_CHANGED"/>
+                <action android:name="android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
