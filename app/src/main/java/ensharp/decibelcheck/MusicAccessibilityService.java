@@ -12,12 +12,12 @@ import android.view.accessibility.AccessibilityEvent;
 public class MusicAccessibilityService extends AccessibilityService{
     static final String TAG = "출력값";
     static String packageName = "없음";
-    public SharedPreferences pref;
+    public SharedPreferences mPref;
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-        pref = new SharedPreferences(this);
+        mPref = new SharedPreferences(this);
         //Configure these here for compatibility with API 13 and below.
         AccessibilityServiceInfo config = new AccessibilityServiceInfo();
         config.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
@@ -51,25 +51,33 @@ public class MusicAccessibilityService extends AccessibilityService{
         //Log.i("onAccessibilityEvent 함수", "앱명 : " + event.getPackageName().toString());
         //com.sec.android.app.music
 
-        switch (event.getPackageName().toString()) {
+           switch (event.getPackageName()+"") {
 
-            case "com.sec.android.app.music" :
-                packageName = event.getPackageName().toString();
-                break;
-            case "com.nhn.android.music" :
-                packageName = event.getPackageName().toString();
-                break;
-            case "com.iloen.melon" :
-                packageName = event.getPackageName().toString();
-                break;
-
-            default : break;
-
-        }
-        Log.v(TAG, String.format(
-                "onAccessibilityEvent: [type] %s [class] %s [package] %s [time] %s [text] %s [contentdescription] %s" ,
-                getEventType(event), event.getClassName(), event.getPackageName(),
-                event.getEventTime(), getEventText(event), getContentDescription(event)));
+               case "com.sec.android.app.music":
+                   packageName = event.getPackageName().toString();
+                   Log.v(TAG, String.format(
+                           "onAccessibilityEvent: [type] %s [class] %s [package] %s [time] %s [text] %s [contentdescription] %s",
+                           getEventType(event), event.getClassName(), event.getPackageName(),
+                           event.getEventTime(), getEventText(event), getContentDescription(event)));
+                   break;
+               case "com.nhn.android.music":
+                   packageName = event.getPackageName().toString();
+                   Log.v(TAG, String.format(
+                           "onAccessibilityEvent: [type] %s [class] %s [package] %s [time] %s [text] %s [contentdescription] %s",
+                           getEventType(event), event.getClassName(), event.getPackageName(),
+                           event.getEventTime(), getEventText(event), getContentDescription(event)));
+                   break;
+               case "com.iloen.melon":
+                   packageName = event.getPackageName().toString();
+                   Log.v(TAG, String.format(
+                           "onAccessibilityEvent: [type] %s [class] %s [package] %s [time] %s [text] %s [contentdescription] %s",
+                           getEventType(event), event.getClassName(), event.getPackageName(),
+                           event.getEventTime(), getEventText(event), getContentDescription(event)));
+                   break;
+               default:
+                   packageName = mPref.getValue("lastPackageName", "com.sec.android.app.music", "lastTrackInformation");
+                   break;
+           }
     }
 //        if(manager.isMusicActive()) {
 //            Log.e("음악재생여부", "재생중" + "  " + event.getPackageName());

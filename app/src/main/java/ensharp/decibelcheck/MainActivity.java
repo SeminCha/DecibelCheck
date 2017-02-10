@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -48,7 +47,7 @@ public class MainActivity extends Activity {
         pref = new SharedPreferences(this);
         //Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
         //startActivityForResult(intent, 0);
-        Toast.makeText(this, "onCreate 실행", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onCreate 실행", Toast.LENGTH_SHORT).show();
         setMainUiInfo();
         serviceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,6 +138,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        Toast.makeText(this, "onResume 실행", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onResume 실행", Toast.LENGTH_SHORT).show();
     }
 }
