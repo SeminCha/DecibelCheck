@@ -37,6 +37,15 @@ public class SharedPreferences {
         editor.commit();
     }
 
+    public void putValue(String key, long value, String prefName) {
+        android.content.SharedPreferences pref = mContext.getSharedPreferences(prefName,
+                Activity.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = pref.edit();
+
+        editor.putLong(key, value);
+        editor.commit();
+    }
+
     public String getValue(String key, String dftValue, String prefName) {
         android.content.SharedPreferences pref = mContext.getSharedPreferences(prefName,
                 Activity.MODE_PRIVATE);
@@ -52,6 +61,16 @@ public class SharedPreferences {
                 Activity.MODE_PRIVATE);
         try {
             return pref.getBoolean(key, dftValue);
+        } catch (Exception e) {
+            return dftValue;
+        }
+    }
+
+    public long getValue(String key, long dftValue, String prefName) {
+        android.content.SharedPreferences pref = mContext.getSharedPreferences(prefName,
+                Activity.MODE_PRIVATE);
+        try {
+            return pref.getLong(key, dftValue);
         } catch (Exception e) {
             return dftValue;
         }

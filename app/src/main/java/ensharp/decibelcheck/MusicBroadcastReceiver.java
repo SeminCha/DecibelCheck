@@ -21,6 +21,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
     MainService mainService = new MainService();
     MainService.myServiceHandler mHandler = mainService.new myServiceHandler();
     MusicAccessibilityService mMusicAccessibilityService = new MusicAccessibilityService();
+    ListeningService mListeningService;
     SharedPreferences mPref;
     private static final int SEND_MUSIC_INFORMATION = 6;
 
@@ -29,12 +30,15 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
     private String mTrackFullPath;
     private String mPackageName;
     private boolean mIsPlaying;
+    Intent mIntent;
 
     private AudioManager mAudioManager;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         mPref = new SharedPreferences(context);
+        mListeningService = new ListeningService();
+        mIntent = new Intent(context, ListeningService.class);
         //mAudioManager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
         String action = intent.getAction();
         //String cmd = intent.getStringExtra("command");
@@ -124,6 +128,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
             mMsg.obj = musicInfo;
             mHandler.sendMessage(mMsg);
             mPref.putValue("0", musicInfo, "음악 재생 정보");
+            context.startService(mIntent);
             Log.e("음악재생여부", "재생중");
         } else {
             mMsg.what = SEND_MUSIC_INFORMATION;
@@ -132,6 +137,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
             mHandler.sendMessage(mMsg);
             //Log.i("저장값", "lastTrackName : " + mTrackName + " lastPackageName : " + mPackageName);
             mPref.putValue("0", musicInfo, "음악 재생 정보");
+            context.stopService(mIntent);
             Log.e("음악재생여부", "일시정지");
         }
     }

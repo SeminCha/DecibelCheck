@@ -13,15 +13,14 @@ import android.util.Log;
 /**
  * Created by Semin on 2017-01-27.
  */
-public class ServiceThread extends Thread implements AudioManager.OnAudioFocusChangeListener {
+public class MainServiceThread extends Thread implements AudioManager.OnAudioFocusChangeListener {
 
-    Handler mHandler;
-    Context mContext;
-    boolean isRun;
-    IntentFilter mIntentFilter;
-    Message mMsg;
-    public SharedPreferences pref;
-    MusicAccessibilityService musicAccessibilityService;
+    private Handler mHandler;
+    private Context mContext;
+    private IntentFilter mIntentFilter;
+    private Message mMsg;
+    private SharedPreferences mPref;
+    private AudioManager mAudioManager;
     private static final int SEND_THREAD_START_MESSAGE = 0;
     private static final int SEND_THREAD_STOP_MESSAGE = 1;
     private static final int SEND_THREAD_NORMALEARPHONE_PLUGGED = 2;
@@ -29,51 +28,44 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
     private static final int SEND_THREAD_BLUETOOTHEARPHONE_CONNECTED = 4;
     private static final int SEND_THREAD_BLUETOOTHEARPHONE_UNCONNECTED = 5;
     private static final int SEND_MUSIC_INFORMATION = 6;
-    AudioManager audioManager;
 
-    public ServiceThread() {
+
+    public MainServiceThread() {
     }
 
-    public void setIsServiceRun(boolean isRun) {
-        this.isRun = isRun;
-    }
-
-    public ServiceThread(Handler handler, Context context) {
+    public MainServiceThread(Handler handler, Context context) {
         this.mHandler = handler;
         this.mContext = context;
-        pref = new SharedPreferences(context);
-        musicAccessibilityService = new MusicAccessibilityService();
+        mPref = new SharedPreferences(context);
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
-//        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-//        int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
-//                AudioManager.AUDIOFOCUS_GAIN);
-//        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-//            Log.e("오디오 포커스 결과", "획득");
-//        } else if (result == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
-//            Log.e("오디오 포커스 결과", "획득실패");
-//        }
+        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int result = mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.e("오디오 포커스 결과", "획득");
+        } else if (result == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
+            Log.e("오디오 포커스 결과", "획득실패");
+        }
     }
 
     public void stopRunning() {
         synchronized (this) {
             Log.i("서비스 중지", "stopRunning");
             mContext.unregisterReceiver(headSetConnectReceiver);
-            this.isRun = false;
         }
     }
 
     public void run() {
         mContext.registerReceiver(headSetConnectReceiver, mIntentFilter, null, mHandler);
 
-        if (isRun) {
             Log.i("서비스 run", "sendEmptyMessage");
             mHandler.sendEmptyMessage(SEND_THREAD_START_MESSAGE);
             try {
                 Thread.sleep(5000);
             } catch (Exception e) {
             }
-        }
+
     }
 
     // 일반 이어폰만 정적 브로드캐스트 리시버로 구현
@@ -92,14 +84,14 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
                     mMsg.what = SEND_THREAD_NORMALEARPHONE_PLUGGED;
                     mMsg.obj = "O";
                     mHandler.sendMessage(mMsg);
-                    pref.putValue("0", true, "normalEarphone");
+                    mPref.putValue("0", true, "normalEarphone");
                     //normalEarphoneTxt.setText("Yes");
                 } else {
                     Log.e("일반 이어폰 log", "Earphone is unPlugged");
                     mMsg.what = SEND_THREAD_NORMALEARPHONE_UNPLUGGED;
                     mMsg.obj = "X";
                     mHandler.sendMessage(mMsg);
-                    pref.putValue("0", false, "normalEarphone");
+                    mPref.putValue("0", false, "normalEarphone");
                     //normalEarphoneTxt.setText("No");
                 }
             }
