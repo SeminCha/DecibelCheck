@@ -65,6 +65,8 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
                     }
                 }
             }
+            mPref.putValue("lastPackageName", mPackageName, "lastTrackInformation");
+            mPref.putValue("lastTrackName",mTrackName,"lastTrackInformation");
             Log.i("삼성앱 음원정보 결과값","가수 : " + mArtistName + " 제목 : " + mTrackName + " 음원저장경로 : " + mTrackFullPath + " 앱명 : " + mPackageName + " 시작점 : " + startPosition);
         } else {
             Uri mAudioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -86,6 +88,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
                 mTrackFullPath = "스트리밍 음원";
                 mArtistName = intent.getStringExtra("artist");
             }
+            mPref.putValue("lastPackageName", mPackageName, "lastTrackInformation");
             Log.i("다른앱 음원정보 결과값","가수 : " + mArtistName + " 제목 : " + mTrackName + " 음원저장경로 : " + mTrackFullPath + " 앱명 : " + mPackageName);
         }
 //        String all = intent.getScheme();
@@ -125,9 +128,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
             String musicInfo = new String("정지");
             mMsg.obj = musicInfo;
             mHandler.sendMessage(mMsg);
-            mPref.putValue("lastPackageName", mPackageName, "lastTrackInformation");
-            mPref.putValue("lastTrackName",mTrackName,"lastTrackInformation");
-            Log.i("저장값", "lastTrackName : " + mTrackName + " lastPackageName : " + mPackageName);
+            //Log.i("저장값", "lastTrackName : " + mTrackName + " lastPackageName : " + mPackageName);
             mPref.putValue("0", musicInfo, "음악 재생 정보");
             Log.e("음악재생여부", "일시정지");
         }
