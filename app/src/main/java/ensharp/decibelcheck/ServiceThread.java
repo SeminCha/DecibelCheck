@@ -15,11 +15,11 @@ import android.util.Log;
  */
 public class ServiceThread extends Thread implements AudioManager.OnAudioFocusChangeListener {
 
-    Handler handler;
-    Context context;
+    Handler mHandler;
+    Context mContext;
     boolean isRun;
-    IntentFilter intentFilter;
-    Message msg;
+    IntentFilter mIntentFilter;
+    Message mMsg;
     public SharedPreferences pref;
     MusicAccessibilityService musicAccessibilityService;
     private static final int SEND_THREAD_START_MESSAGE = 0;
@@ -39,11 +39,12 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
     }
 
     public ServiceThread(Handler handler, Context context) {
-        this.handler = handler;
-        this.context = context;
+        this.mHandler = handler;
+        this.mContext = context;
         pref = new SharedPreferences(context);
         musicAccessibilityService = new MusicAccessibilityService();
-
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
 //        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 //        int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
 //                AudioManager.AUDIOFOCUS_GAIN);
@@ -57,17 +58,17 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
     public void stopRunning() {
         synchronized (this) {
             Log.i("서비스 중지", "stopRunning");
-            context.unregisterReceiver(headSetConnectReceiver);
+            mContext.unregisterReceiver(headSetConnectReceiver);
             this.isRun = false;
         }
     }
 
     public void run() {
-        context.registerReceiver(headSetConnectReceiver, intentFilter, null, handler);
+        mContext.registerReceiver(headSetConnectReceiver, mIntentFilter, null, mHandler);
 
         if (isRun) {
             Log.i("서비스 run", "sendEmptyMessage");
-            handler.sendEmptyMessage(SEND_THREAD_START_MESSAGE);
+            mHandler.sendEmptyMessage(SEND_THREAD_START_MESSAGE);
             try {
                 Thread.sleep(5000);
             } catch (Exception e) {
@@ -81,23 +82,23 @@ public class ServiceThread extends Thread implements AudioManager.OnAudioFocusCh
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             int headSetState;
-            msg = handler.obtainMessage();
+            mMsg = mHandler.obtainMessage();
             headSetState = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, -1);
             Log.i("headSetState", Integer.toString(headSetState));
             if (action.equals(intent.ACTION_HEADSET_PLUG)) {
                 boolean isEarphoneOn = (intent.getIntExtra("state", 0) > 0) ? true : false;
                 if (isEarphoneOn) {
                     Log.e("일반 이어폰 log", "Earphone is plugged");
-                    msg.what = SEND_THREAD_NORMALEARPHONE_PLUGGED;
-                    msg.obj = "O";
-                    handler.sendMessage(msg);
+                    mMsg.what = SEND_THREAD_NORMALEARPHONE_PLUGGED;
+                    mMsg.obj = "O";
+                    mHandler.sendMessage(mMsg);
                     pref.putValue("0", true, "normalEarphone");
                     //normalEarphoneTxt.setText("Yes");
                 } else {
                     Log.e("일반 이어폰 log", "Earphone is unPlugged");
-                    msg.what = SEND_THREAD_NORMALEARPHONE_UNPLUGGED;
-                    msg.obj = "X";
-                    handler.sendMessage(msg);
+                    mMsg.what = SEND_THREAD_NORMALEARPHONE_UNPLUGGED;
+                    mMsg.obj = "X";
+                    mHandler.sendMessage(mMsg);
                     pref.putValue("0", false, "normalEarphone");
                     //normalEarphoneTxt.setText("No");
                 }

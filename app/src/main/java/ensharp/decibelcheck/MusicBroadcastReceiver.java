@@ -28,17 +28,19 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
     private String mArtistName;
     private String mTrackFullPath;
     private String mPackageName;
+    private boolean mIsPlaying;
 
     private AudioManager mAudioManager;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         mPref = new SharedPreferences(context);
-        mAudioManager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
+        //mAudioManager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
         String action = intent.getAction();
         //String cmd = intent.getStringExtra("command");
         Log.v("tag ", action);
         mTrackName = intent.getStringExtra("track");
+        mIsPlaying = intent.getExtras().getBoolean("playing");
         mPackageName = mMusicAccessibilityService.packageName;
         //음악제목값이 null일 경우 마지막 재생된 노래제목 가져오기
         if(mTrackName == null) {
@@ -116,7 +118,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
 //        Log.e("노래경로", "노래경로 : " + fullpath + "****** 가수 : " + artist + "****** 제목 : " + selection);
 
        mMsg = mHandler.obtainMessage();
-        if (mAudioManager.isMusicActive()) {
+        if (mIsPlaying) {
             mMsg.what = SEND_MUSIC_INFORMATION;
             String musicInfo = new String("가수 : " + mArtistName + "\n" + "제목 : " + mTrackName + "\n" + "음원저장경로 : " + mTrackFullPath + "\n" + "앱명 : " + mPackageName);
             mMsg.obj = musicInfo;
