@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ public class MainActivity extends Activity {
     public boolean isServiceOn;
     public SharedPreferences pref;
     private ServiceData mServiceData;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +46,9 @@ public class MainActivity extends Activity {
         elapseTxt = (TextView) findViewById(R.id.elapseTxt);
         //currentPlayingAppTxt = (TextView) findViewById(R.id.currentPlayingAppTxt);
         serviceBtn = (Button) findViewById(R.id.serviceBtn);
-        final MainServiceThread thread = new MainServiceThread();
-        mServiceData = (ServiceData) getApplication();
+        mContext = this;
+        mServiceData = new ServiceData(mContext);
         pref = new SharedPreferences(this);
-        //Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        //startActivityForResult(intent, 0);
-        //Toast.makeText(this, "onCreate 실행", Toast.LENGTH_SHORT).show();
         setMainUiInfo();
         serviceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,8 +91,14 @@ public class MainActivity extends Activity {
             Log.i("서비스 러닝여부", "X");
         }
 
-        musicOnTxt.setText(pref.getValue("0", "없음", "음악 재생 정보"));
-        elapseTxt.setText(pref.getValue("todayListeningTimeUI", "00:00:00", "todayInfo"));
+        if(!mServiceData.isMyServiceRunning(ListeningService.class)) {
+            musicOnTxt.setText(pref.getValue("0", "없음", "음악 재생 정보"));
+            elapseTxt.setText(mServiceData.convertLongToHms(pref.getValue("todayListeningTime", 0, "todayInfo")));
+            Log.i("리스닝 서비스 러닝여부", "X");
+        } else {
+            musicOnTxt.setText(pref.getValue("0", "없음", "음악 재생 정보"));
+            Log.i("서비스 러닝여부", "O");
+        }
     }
 
 

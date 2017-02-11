@@ -10,8 +10,6 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Created by Semin on 2017-02-10.
  */
@@ -30,6 +28,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
     private String mTrackFullPath;
     private String mPackageName;
     private boolean mIsPlaying;
+    private ServiceData mServiceData;
     Intent mIntent;
 
     private AudioManager mAudioManager;
@@ -39,7 +38,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
         mPref = new SharedPreferences(context);
         mListeningService = new ListeningService();
         mIntent = new Intent(context, ListeningService.class);
-        //mAudioManager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
+        mServiceData = new ServiceData(context);
         String action = intent.getAction();
         //String cmd = intent.getStringExtra("command");
         Log.v("tag ", action);
@@ -65,7 +64,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
                             .getColumnIndex(MediaStore.Audio.Media.DATA));
                     mArtistName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     if(action.contains("playstatechanged")) {
-                        startPosition = convertDuration(intent.getExtras().getLong("position"));
+                        startPosition = mServiceData.convertLongToHms(intent.getExtras().getLong("position"));
                     } else {
                         startPosition = "00:00:00";
                     }
@@ -128,7 +127,9 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
             mMsg.obj = musicInfo;
             mHandler.sendMessage(mMsg);
             mPref.putValue("0", musicInfo, "음악 재생 정보");
-            context.startService(mIntent);
+            if(!mServiceData.isMyServiceRunning(ListeningService.class)) {
+                context.startService(mIntent);
+            }
             Log.e("음악재생여부", "재생중");
         } else {
             mMsg.what = SEND_MUSIC_INFORMATION;
@@ -137,15 +138,10 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
             mHandler.sendMessage(mMsg);
             //Log.i("저장값", "lastTrackName : " + mTrackName + " lastPackageName : " + mPackageName);
             mPref.putValue("0", musicInfo, "음악 재생 정보");
-            context.stopService(mIntent);
+            if(mServiceData.isMyServiceRunning(ListeningService.class)) {
+                context.stopService(mIntent);
+            }
             Log.e("음악재생여부", "일시정지");
         }
-    }
-
-    public String convertDuration(long millis) {
-        String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
-                TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-                TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
-        return hms;
     }
 }

@@ -27,8 +27,7 @@ public class DateChangedBroadCastReceiver extends BroadcastReceiver {
             mPref = new SharedPreferences(context);
 
             mPref.putValue("todayDate",mDateFormat.toString(),"todayInfo");
-            mPref.putValue("todayListeningTimeUI","00:00:00","todayInfo");
-            mPref.putValue("todayListeningTimeBack",0,"todayInfo");
+            mPref.putValue("todayListeningTime",0,"todayInfo");
             Log.i("날짜변경브로드캐스트리시버 작동","todayDate : " + mDateFormat.toString());
         }
     }

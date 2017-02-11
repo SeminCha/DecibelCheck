@@ -25,8 +25,9 @@ public class ListeningService extends Service {
     private Message mMsg;
     private String mListeningTime;
     private long mMillis;
-    private static final int START = 0;
+    private static final int RUN= 0;
     private static final int PAUSE = 1;
+    private int mState;
     private static final int SEND_LISTENING_ELAPSE = 7;
 
     @Override
@@ -34,23 +35,12 @@ public class ListeningService extends Service {
         super.onCreate();
         mPref = new SharedPreferences(this);
         Log.i("리스닝서비스 onCreate", "listeningservice여기 옴");
-        if(mPref.getValue("todayListeningTimeUI","00:00:00","todayInfo").equals("00:00:00")){
-//            mPref.putValue("baseTime",SystemClock.elapsedRealtime(),"todayInfo");
-//            mPref.putValue("pauseTime",SystemClock.elapsedRealtime(),"todayInfo");
-            mBaseTime = SystemClock.elapsedRealtime();
-            mPref.putValue("baseTime",mBaseTime,"todayInfo");
-            mPauseTime = SystemClock.elapsedRealtime();
-        } else {
-            mBaseTime = mPref.getValue("baseTime",SystemClock.elapsedRealtime(),"todayInfo");
-            mPauseTime = mPref.getValue("pauseTime",SystemClock.elapsedRealtime(),"todayInfo");
-        }
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("리스닝서비스 onStartCommand", "listeningservice여기 옴");
-        controlElapse(START);
+        controlElapse(RUN);
         return START_STICKY;
     }
 
@@ -66,42 +56,33 @@ public class ListeningService extends Service {
         return null;
     }
 
-//    public String getElapse() {
-//        long now = SystemClock.elapsedRealtime();
-//        long elapse = now - mBaseTime;
-//        String sElapse = String.format("%02d:%02d:%02d", elapse / 1000 / 60, (elapse / 1000) % 60, (elapse % 1000) / 10);
-//        return sElapse;
-//    }
-
     public void controlElapse(int mode) {
 
         switch (mode) {
 
-            case START :
-                long now = SystemClock.elapsedRealtime();
+            case RUN :
+                mBaseTime = SystemClock.elapsedRealtime();
                 myTimer.sendEmptyMessage(0);
-                mBaseTime += now - mPauseTime;
-                mPref.putValue("baseTime",mBaseTime,"todayInfo");
                 break;
             case PAUSE :
                 myTimer.removeMessages(0);
-                mPref.putValue("pauseTime",SystemClock.elapsedRealtime(),"todayInfo");
-                mPref.putValue("todayListeningTimeUI",mListeningTime,"todayInfo");
-                mPref.putValue("todayListeningTimeBack",mMillis,"todayInfo");
+                //mPref.putValue("pauseTime",SystemClock.elapsedRealtime(),"todayInfo");
+                //mPref.putValue("todayListeningTimeUI",mListeningTime,"todayInfo");
+                mPref.putValue("todayListeningTime",mMillis,"todayInfo");
                 mPauseTime = SystemClock.elapsedRealtime();
                 break;
         }
     }
 
-    String getTimeOut(){
+    public String getTimeOut(){
         long now = SystemClock.elapsedRealtime(); //애플리케이션이 실행되고나서 실제로 경과된 시간(??)^^;
-        mMillis = now - mBaseTime;
+        mMillis = now - mBaseTime + mPref.getValue("todayListeningTime",0,"todayInfo");
         //String easy_outTime = String.format("%02d:%02d:%02d", outTime/1000 / 60, (outTime/1000)%60,(outTime%1000)/10);
         String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(mMillis),
                 TimeUnit.MILLISECONDS.toMinutes(mMillis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(mMillis)),
                 TimeUnit.MILLISECONDS.toSeconds(mMillis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(mMillis)));
+        Log.i("getTimeOut의 값",hms);
         return hms;
-
     }
 
     Handler myTimer = new Handler(){
