@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -21,6 +20,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
     MusicAccessibilityService mMusicAccessibilityService = new MusicAccessibilityService();
     ListeningService mListeningService;
     SharedPreferences mPref;
+    SoundFile mSoundfile;
     private static final int SEND_MUSIC_INFORMATION = 6;
 
     private String mTrackName;
@@ -31,7 +31,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
     private ServiceData mServiceData;
     Intent mIntent;
 
-    private AudioManager mAudioManager;
+    private ListeningServiceThread mListeningServiceThread;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -39,6 +39,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
         mListeningService = new ListeningService();
         mIntent = new Intent(context, ListeningService.class);
         mServiceData = new ServiceData(context);
+        mListeningServiceThread = new ListeningServiceThread();
         String action = intent.getAction();
         //String cmd = intent.getStringExtra("command");
         Log.v("tag ", action);
@@ -131,6 +132,12 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
                 context.startService(mIntent);
             }
             Log.e("음악재생여부", "재생중");
+            mSoundfile = new SoundFile();
+            try {
+                mSoundfile.create(mTrackFullPath);
+            }catch (final Exception e) {
+                Log.e("mSoundfile이 null", "사운드 파일 없음");
+            }
         } else {
             mMsg.what = SEND_MUSIC_INFORMATION;
             String musicInfo = new String("정지");

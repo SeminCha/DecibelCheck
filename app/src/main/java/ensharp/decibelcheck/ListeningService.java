@@ -81,7 +81,7 @@ public class ListeningService extends Service {
         String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(mMillis),
                 TimeUnit.MILLISECONDS.toMinutes(mMillis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(mMillis)),
                 TimeUnit.MILLISECONDS.toSeconds(mMillis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(mMillis)));
-        Log.i("getTimeOut의 값",hms);
+        //Log.i("getTimeOut의 값",hms);
         return hms;
     }
 

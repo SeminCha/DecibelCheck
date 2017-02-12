@@ -132,7 +132,7 @@ public class MainActivity extends Activity {
                 }
                 break;
             case "음악 청취 시간":
-                Log.i("메인으로 넘어온 값", textContent + "?");
+                //Log.i("메인으로 넘어온 값", textContent + "?");
                 if (elapseTxt != null) {
                     elapseTxt.setText(textContent);
                 }
