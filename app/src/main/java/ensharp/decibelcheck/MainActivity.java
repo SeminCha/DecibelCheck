@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,7 @@ public class MainActivity extends Activity {
     public static TextView musicOnTxt;
     public static TextView elapseTxt;
     public static TextView decibelTxt;
+    public static TextView volumeTxt;
     public TextView currentPlayingAppTxt;
 
     private static final String BLUETOOTH_HEADSET_ACTION = "android.bluetooth.headset.action.STATE_CHANGED";
@@ -35,6 +37,7 @@ public class MainActivity extends Activity {
     public SharedPreferences pref;
     private ServiceData mServiceData;
     private Context mContext;
+    private AudioManager mAudiomanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +49,10 @@ public class MainActivity extends Activity {
         musicOnTxt = (TextView) findViewById(R.id.musicOnTxt);
         elapseTxt = (TextView) findViewById(R.id.elapseTxt);
         decibelTxt = (TextView) findViewById(R.id.decibelsTxt);
+        volumeTxt = (TextView) findViewById(R.id.volumeTxt);
         //currentPlayingAppTxt = (TextView) findViewById(R.id.currentPlayingAppTxt);
         serviceBtn = (Button) findViewById(R.id.serviceBtn);
+        mAudiomanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mContext = this;
         mServiceData = new ServiceData(mContext);
         pref = new SharedPreferences(this);
@@ -105,6 +110,9 @@ public class MainActivity extends Activity {
         if(!mServiceData.isMyServiceRunning(DecibelService.class)) {
             decibelTxt.setText("데시벨 없음");
         }
+
+        int volume = mAudiomanager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        volumeTxt.setText(Integer.toString(volume));
     }
 
 
@@ -147,6 +155,11 @@ public class MainActivity extends Activity {
                 //Log.i("메인으로 넘어온 값", textContent + "?");
                 if (decibelTxt != null) {
                     decibelTxt.setText(textContent);
+                }
+                break;
+            case "현재 음량":
+                if (volumeTxt != null) {
+                    volumeTxt.setText(textContent);
                 }
                 break;
         }

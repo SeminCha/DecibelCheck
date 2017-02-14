@@ -99,6 +99,23 @@
             android:layout_below="@+id/textView2"
             android:layout_alignStart="@+id/musicOnTxt" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="- 음량"
+            android:id="@+id/textView4"
+            android:layout_below="@+id/decibelsTxt"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="26dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="인식 안됨"
+            android:id="@+id/volumeTxt"
+            android:layout_below="@+id/textView4"
+            android:layout_alignEnd="@+id/decibelsTxt" />
+
 
     </RelativeLayout>
 </LinearLayout>

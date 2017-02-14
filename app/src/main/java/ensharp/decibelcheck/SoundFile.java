@@ -273,6 +273,7 @@ public class SoundFile {
         mFrameGains = new int[mNumFrames];
         mFrameLens = new int[mNumFrames];
         mFrameOffsets = new int[mNumFrames];
+        double[] heights = new double[mNumFrames];
         int j;
         int gain, value;
         int frameLens = (int) ((1000 * mAvgBitRate / 8) *
@@ -291,6 +292,7 @@ public class SoundFile {
                     gain = value;
                 }
             }
+            heights[i] = gain;
             mFrameGains[i] = (int) Math.sqrt(gain);  // here gain = sqrt(max value of 1st channel)...
             mFrameLens[i] = frameLens;  // totally not accurate...
             mFrameOffsets[i] = (int) (i * (1000 * mAvgBitRate / 8) *  //  = i * frameLens
@@ -299,12 +301,18 @@ public class SoundFile {
         mDecodedSamples.rewind();
         // DumpSamples();  // Uncomment this line to dump the samples in a TSV file.
         Log.i("ReadFile", "종료");
-        computeDoublesForAllZoomLevels();
+        computeDoublesForAllZoomLevels(heights);
     }
 
-    public void computeDoublesForAllZoomLevels() {
+    public void getAverageHeight() {
+
+
+    }
+
+    public void computeDoublesForAllZoomLevels(double[] musicHeight) {
         Log.i("computeDoubles", "시작");
         double decibels;
+        double[] musicHeights = musicHeight;
         int numFrames = mNumFrames;
         int[] myLenByZoomLevel = new int[5];
         double[] myZoomFactorByZoomLevel = new double[5];
@@ -386,7 +394,7 @@ public class SoundFile {
         }
 
         // Compute the heights
-        double[] heights = new double[numFrames];
+        //double[] heights = new double[numFrames];
         myLenByZoomLevel[0] = numFrames * 2;
         myLenByZoomLevel[1] = numFrames;
         myZoomFactorByZoomLevel[0] = 2.0;
@@ -417,21 +425,11 @@ public class SoundFile {
         double averageHeight = 0.0;
 
         for (int i = 0; i < numFrames; i++) {
-            double value = (smoothedGains[i] * scaleFactor - minGain) / range;
-            if (value < 0.0) {
-                value = 0.0;
-            }
-            if (value > 1.0) {
-                value = 1.0;
-            }
-            heights[i] = value * value;
-            Log.i("예상 음높이 값 " + Integer.toString(i), Double.toString(heights[i]));
-
             if (seconds < arrayNum) {
                 //Log.i("과정"," if(seconds < arrayNum) {");
                 if (seconds == (arrayNum - 1)) {
                     //Log.i("과정","seconds == (arrayNum - 1)");
-                    sumHeight += heights[i];
+                    sumHeight += musicHeights[i];
                     //Log.i("과정","sumHeight += heights[i]");
                     count++;
                     //Log.i("과정","count++");
@@ -441,33 +439,90 @@ public class SoundFile {
                         //Log.i("과정"," averageHeight = sumHeight / (double) count");
                         perSecondsHeight[seconds] = averageHeight;
                         decibels = DECIBEL_CONSTANTS * Math.log10(perSecondsHeight[seconds]);
-                        mPref.putValue(Integer.toString(seconds), Double.toString(perSecondsHeight[seconds]), mKeyName);
+                        mPref.putValue(Integer.toString(seconds), Double.toString(decibels), mKeyName);
                         //Log.i("평균 예상값", "perSecondsHeight[" + seconds + "] = " + averageHeight);
-                        Log.i("평균 예상값","데시벨["+seconds+"] = " + decibels);
+                        //Log.i("평균 예상값", "데시벨[" + seconds + "] = " + decibels);
                     }
                     //seconds < arrayNum
                 } else {
                     if (seconds == (i / arrayRange)) {
                         //Log.i("평균 예상값"," if (seconds == (i / arrayRange))");
-                        sumHeight += heights[i];
+                        sumHeight += musicHeights[i];
                         count++;
                     } else {
-                        averageHeight = sumHeight / (double) count;
+                        if(count==0) {
+                            averageHeight = 0;
+                        } else {
+                            averageHeight = sumHeight / (double) count;
+                        }
                         //Log.i("평균 예상값","averageHeight = sumHeight / (double) count");
                         sumHeight = 0.0;
                         count = 0;
                         perSecondsHeight[seconds] = averageHeight;
                         decibels = DECIBEL_CONSTANTS * Math.log10(perSecondsHeight[seconds]);
-                        mPref.putValue(Integer.toString(seconds), Double.toString(perSecondsHeight[seconds]), mKeyName);
+                        mPref.putValue(Integer.toString(seconds), Double.toString(decibels), mKeyName);
                         //Log.i("평균 예상값", "perSecondsHeight[" + seconds + "] = " + averageHeight);
-                        Log.i("평균 예상값","데시벨["+seconds+"] = " + decibels);
+                        //Log.i("평균 예상값", "데시벨[" + seconds + "] = " + decibels);
                         seconds++;
-                        sumHeight += heights[i];
+                        sumHeight += musicHeights[i];
                         count++;
                     }
                 }
             }
         }
+
+//        for (int i = 0; i < numFrames; i++) {
+//            double value = (smoothedGains[i] * scaleFactor - minGain) / range;
+//            if (value < 0.0) {
+//                value = 0.0;
+//            }
+//            if (value > 1.0) {
+//                value = 1.0;
+//            }
+//            heights[i] = value * value;
+//            Log.i("예상 음높이 값 " + Integer.toString(i), Double.toString(heights[i]));
+//
+//            if (seconds < arrayNum) {
+//                //Log.i("과정"," if(seconds < arrayNum) {");
+//                if (seconds == (arrayNum - 1)) {
+//                    //Log.i("과정","seconds == (arrayNum - 1)");
+//                    sumHeight += heights[i];
+//                    //Log.i("과정","sumHeight += heights[i]");
+//                    count++;
+//                    //Log.i("과정","count++");
+//                    if (i == (numFrames - 1)) {
+//                        //Log.i("과정","i == (numFrames - 1)");
+//                        averageHeight = sumHeight / (double) count;
+//                        //Log.i("과정"," averageHeight = sumHeight / (double) count");
+//                        perSecondsHeight[seconds] = averageHeight;
+//                        decibels = DECIBEL_CONSTANTS * Math.log10(perSecondsHeight[seconds]);
+//                        mPref.putValue(Integer.toString(seconds), Double.toString(perSecondsHeight[seconds]), mKeyName);
+//                        //Log.i("평균 예상값", "perSecondsHeight[" + seconds + "] = " + averageHeight);
+//                        Log.i("평균 예상값","데시벨["+seconds+"] = " + decibels);
+//                    }
+//                    //seconds < arrayNum
+//                } else {
+//                    if (seconds == (i / arrayRange)) {
+//                        //Log.i("평균 예상값"," if (seconds == (i / arrayRange))");
+//                        sumHeight += heights[i];
+//                        count++;
+//                    } else {
+//                        averageHeight = sumHeight / (double) count;
+//                        //Log.i("평균 예상값","averageHeight = sumHeight / (double) count");
+//                        sumHeight = 0.0;
+//                        count = 0;
+//                        perSecondsHeight[seconds] = averageHeight;
+//                        decibels = DECIBEL_CONSTANTS * Math.log10(perSecondsHeight[seconds]);
+//                        mPref.putValue(Integer.toString(seconds), Double.toString(perSecondsHeight[seconds]), mKeyName);
+//                        //Log.i("평균 예상값", "perSecondsHeight[" + seconds + "] = " + averageHeight);
+//                        Log.i("평균 예상값","데시벨["+seconds+"] = " + decibels);
+//                        seconds++;
+//                        sumHeight += heights[i];
+//                        count++;
+//                    }
+//                }
+//            }
+//        }
         Log.i("computeDoubles", "종료");
     }
 

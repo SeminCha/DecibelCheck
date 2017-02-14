@@ -50,16 +50,23 @@
                 <action android:name="com.android.music.playstatechanged" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".DateChangedBroadCastReceiver">
+        <receiver android:name=".DateChangedBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.DATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".VolumeBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.media.VOLUME_CHANGED_ACTION" />
+                <action android:name="android.media.EXTRA_VOLUME_STREAM_VALUE"/>
             </intent-filter>
         </receiver>
         <service
             android:name=".ListeningService"
             android:enabled="true"
             android:exported="true"></service>
-        <service android:name=".DecibelService"
+        <service
+            android:name=".DecibelService"
             android:enabled="true"
             android:exported="true"></service>
     </application>

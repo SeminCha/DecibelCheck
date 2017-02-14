@@ -63,12 +63,14 @@ public class ListeningService extends Service {
             case RUN :
                 mBaseTime = SystemClock.elapsedRealtime();
                 myTimer.sendEmptyMessage(0);
+                //Log.i("저장된 시간",mPref.getValue("todayListeningTime",0,"todayInfo"));
                 break;
             case PAUSE :
                 myTimer.removeMessages(0);
                 //mPref.putValue("pauseTime",SystemClock.elapsedRealtime(),"todayInfo");
                 //mPref.putValue("todayListeningTimeUI",mListeningTime,"todayInfo");
                 mPref.putValue("todayListeningTime",mMillis,"todayInfo");
+                //Log.i("저장할 시간",mMillis+" ");
                 mPauseTime = SystemClock.elapsedRealtime();
                 break;
         }

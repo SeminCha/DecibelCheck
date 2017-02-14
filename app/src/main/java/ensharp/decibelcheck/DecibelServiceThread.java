@@ -48,8 +48,10 @@ public class DecibelServiceThread extends Thread {
         mPref = new SharedPreferences(mContext);
 
         try {
-            mSoundFile.create(mTrackFullPath, mKeyName, mContext);
-            //controlElapse(RUN);
+            controlElapse(RUN);
+            if(mPref.getValue(Integer.toString(mSeconds),"인식못함",mKeyName).equals("인식못함")){
+                mSoundFile.create(mTrackFullPath, mKeyName, mContext);
+            }
         } catch (final Exception e) {
             Log.e("mSoundfile이 null", "사운드 파일 없음");
         }
@@ -70,6 +72,7 @@ public class DecibelServiceThread extends Thread {
                 break;
             case PAUSE :
                 myTimer.removeMessages(0);
+                Log.i("PAUSE","보냄");
                 break;
         }
     }
@@ -80,7 +83,7 @@ public class DecibelServiceThread extends Thread {
         //String easy_outTime = String.format("%02d:%02d:%02d", outTime/1000 / 60, (outTime/1000)%60,(outTime%1000)/10);
         String ms = String.format("%02d:%02d", TimeUnit.MILLISECONDS.toMinutes(mMillis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(mMillis)),
                 TimeUnit.MILLISECONDS.toSeconds(mMillis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(mMillis)));
-        mSeconds = (int) (mMillis/1000)%60;
+        mSeconds = (int) mMillis/1000;
         mDecibels = mPref.getValue(Integer.toString(mSeconds),"인식못함",mKeyName);
         return "현재 재생위치 : " + mSeconds + " / " + ms + " 현재 데시벨 : " + mDecibels;
     }
@@ -89,6 +92,7 @@ public class DecibelServiceThread extends Thread {
         public void handleMessage(Message msg){
             MainActivity.setMainUiText("현재 데시벨", getTimeOut());
             //sendEmptyMessage 는 비어있는 메세지를 Handler 에게 전송하는겁니다.
+            //Log.i("RUN","작동중");
             myTimer.sendEmptyMessage(0);
         }
     };

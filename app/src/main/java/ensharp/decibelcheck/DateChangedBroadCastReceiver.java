@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * Created by Semin on 2017-02-11.
  */
-public class DateChangedBroadCastReceiver extends BroadcastReceiver {
+public class DateChangedBroadcastReceiver extends BroadcastReceiver {
 
     private Date mToday;
     private SimpleDateFormat mDateFormat;

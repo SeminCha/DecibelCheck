@@ -31,12 +31,14 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
     private ServiceData mServiceData;
     private String mMusicKeyName;
     Intent mIntent;
+    Intent mdBIntent;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         mPref = new SharedPreferences(context);
         mListeningService = new ListeningService();
         mIntent = new Intent(context, ListeningService.class);
+        mdBIntent = new Intent(context, DecibelService.class);
         mServiceData = new ServiceData(context);
         String action = intent.getAction();
         //String cmd = intent.getStringExtra("command");
@@ -84,11 +86,20 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
                 if(!mServiceData.isMyServiceRunning(ListeningService.class)) {
                     context.startService(mIntent);
                 }
-                mIntent = new Intent(context, DecibelService.class);
-                mIntent.putExtra("trackFullPath",mTrackFullPath);
-                mIntent.putExtra("position", startPosition);
-                mIntent.putExtra("keyName",mMusicKeyName);
-                context.startService(mIntent);
+
+                if(mServiceData.isMyServiceRunning(DecibelService.class)) {
+                    context.stopService(mdBIntent);
+                    mdBIntent = new Intent(context, DecibelService.class);
+                    mdBIntent.putExtra("trackFullPath", mTrackFullPath);
+                    mdBIntent.putExtra("position", startPosition);
+                    mdBIntent.putExtra("keyName", mMusicKeyName);
+                    context.startService(mdBIntent);
+                } else {
+                    mdBIntent.putExtra("trackFullPath", mTrackFullPath);
+                    mdBIntent.putExtra("position", startPosition);
+                    mdBIntent.putExtra("keyName", mMusicKeyName);
+                    context.startService(mdBIntent);
+                }
                 Log.e("음악재생여부", "재생중");
 //            mSoundfile = new SoundFile();
 //            try {
@@ -106,8 +117,8 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
                 if(mServiceData.isMyServiceRunning(ListeningService.class)) {
                     context.stopService(mIntent);
                 }
-                mIntent = new Intent(context, DecibelService.class);
-                context.stopService(mIntent);
+                //mdBIntent = new Intent(context, DecibelService.class);
+                context.stopService(mdBIntent);
                 Log.e("음악재생여부", "일시정지");
             }
         } else {
