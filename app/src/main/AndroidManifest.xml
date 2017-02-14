@@ -55,9 +55,11 @@
                 <action android:name="android.intent.action.DATE_CHANGED" />
             </intent-filter>
         </receiver>
-
         <service
             android:name=".ListeningService"
+            android:enabled="true"
+            android:exported="true"></service>
+        <service android:name=".DecibelService"
             android:enabled="true"
             android:exported="true"></service>
     </application>

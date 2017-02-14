@@ -82,6 +82,23 @@
             android:layout_below="@+id/textView"
             android:layout_alignEnd="@+id/musicOnTxt" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="- 데시벨"
+            android:id="@+id/textView2"
+            android:layout_marginTop="48dp"
+            android:layout_below="@+id/elapseTxt"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="인식 안됨"
+            android:id="@+id/decibelsTxt"
+            android:layout_below="@+id/textView2"
+            android:layout_alignStart="@+id/musicOnTxt" />
+
 
     </RelativeLayout>
 </LinearLayout>

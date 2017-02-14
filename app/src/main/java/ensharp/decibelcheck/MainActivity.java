@@ -19,6 +19,7 @@ public class MainActivity extends Activity {
     public static TextView bluetoothEarphoneTxt;
     public static TextView musicOnTxt;
     public static TextView elapseTxt;
+    public static TextView decibelTxt;
     public TextView currentPlayingAppTxt;
 
     private static final String BLUETOOTH_HEADSET_ACTION = "android.bluetooth.headset.action.STATE_CHANGED";
@@ -44,6 +45,7 @@ public class MainActivity extends Activity {
         //bluetoothEarphoneTxt = (TextView) findViewById(R.id.bluetoothTxt);
         musicOnTxt = (TextView) findViewById(R.id.musicOnTxt);
         elapseTxt = (TextView) findViewById(R.id.elapseTxt);
+        decibelTxt = (TextView) findViewById(R.id.decibelsTxt);
         //currentPlayingAppTxt = (TextView) findViewById(R.id.currentPlayingAppTxt);
         serviceBtn = (Button) findViewById(R.id.serviceBtn);
         mContext = this;
@@ -99,6 +101,10 @@ public class MainActivity extends Activity {
             musicOnTxt.setText(pref.getValue("0", "없음", "음악 재생 정보"));
             Log.i("서비스 러닝여부", "O");
         }
+
+        if(!mServiceData.isMyServiceRunning(DecibelService.class)) {
+            decibelTxt.setText("데시벨 없음");
+        }
     }
 
 
@@ -135,6 +141,12 @@ public class MainActivity extends Activity {
                 //Log.i("메인으로 넘어온 값", textContent + "?");
                 if (elapseTxt != null) {
                     elapseTxt.setText(textContent);
+                }
+                break;
+            case "현재 데시벨":
+                //Log.i("메인으로 넘어온 값", textContent + "?");
+                if (decibelTxt != null) {
+                    decibelTxt.setText(textContent);
                 }
                 break;
         }
