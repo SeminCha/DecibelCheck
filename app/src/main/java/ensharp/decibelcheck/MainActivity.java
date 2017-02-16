@@ -74,6 +74,51 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        decibelDataSave();
+    }
+
+    public void decibelDataSave(){
+        if(pref.getValue("0","0","Note5")=="0"){
+            for(int i=0;i<16;i++){
+                if(i==0) {
+                    pref.putValue(Integer.toString(i),"3.7","Note5");
+                } else if(i==1) {
+                    pref.putValue(Integer.toString(i),"4.78","Note5");
+                } else if(i==2) {
+                    pref.putValue(Integer.toString(i),"5.11","Note5");
+                } else if(i==3) {
+                    pref.putValue(Integer.toString(i),"6.27","Note5");
+                } else if(i==4) {
+                    pref.putValue(Integer.toString(i),"8.39","Note5");
+                } else if(i==5) {
+                    pref.putValue(Integer.toString(i),"13.28","Note5");
+                } else if(i==6) {
+                    pref.putValue(Integer.toString(i),"20.42","Note5");
+                } else if(i==7) {
+                    pref.putValue(Integer.toString(i),"31.73","Note5");
+                } else if(i==8) {
+                    pref.putValue(Integer.toString(i),"44.92","Note5");
+                } else if(i==9) {
+                    pref.putValue(Integer.toString(i),"55.75","Note5");
+                } else if(i==10) {
+                    pref.putValue(Integer.toString(i),"78","Note5");
+                } else if(i==11) {
+                    pref.putValue(Integer.toString(i),"110.43","Note5");
+                } else if(i==12) {
+                    pref.putValue(Integer.toString(i),"176","Note5");
+                } else if(i==13) {
+                    pref.putValue(Integer.toString(i),"279","Note5");
+                } else if(i==14) {
+                    pref.putValue(Integer.toString(i),"443","Note5");
+                } else if(i==15) {
+                    pref.putValue(Integer.toString(i),"558","Note5");
+                }
+            }
+            pref.putValue("ohm","35","earphone");
+            pref.putValue("spl","97","earphone");
+            pref.putValue("autoControl",false,"setting");
+        }
+
     }
 
     public void setMainUiInfo() {
@@ -112,6 +157,7 @@ public class MainActivity extends Activity {
         }
 
         int volume = mAudiomanager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        VolumeBroadcastReceiver.currentVolume = Integer.toString(volume);
         volumeTxt.setText(Integer.toString(volume));
     }
 

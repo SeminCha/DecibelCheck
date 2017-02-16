@@ -15,6 +15,7 @@ public class VolumeBroadcastReceiver extends BroadcastReceiver {
     private SharedPreferences mPref;
     private AudioManager mAudiomanager;
     private int mVolume;
+    public static String currentVolume;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -25,6 +26,7 @@ public class VolumeBroadcastReceiver extends BroadcastReceiver {
         //int volume = (Integer)intent.getExtras().get("android.media.EXTRA_VOLUME_STREAM_VALUE");
         //Log.i("현재볼륨",volume+" ");
         mPref.putValue("0",mVolume,"currentVolume");
+        currentVolume = Integer.toString(mVolume);
         handler.sendEmptyMessage(0);
     }
 
