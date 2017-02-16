@@ -77,107 +77,113 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
             Log.i("삼성앱 음원정보 결과값","가수 : " + mArtistName + " 제목 : " + mTrackName + " 음원저장경로 : " + mTrackFullPath + " 앱명 : " + mPackageName + " 시작점 : " + Long.toString(startPosition));
             mMusicKeyName = mArtistName + mTrackName;
             mMsg = mHandler.obtainMessage();
-            if (mIsPlaying) {
-                mMsg.what = SEND_MUSIC_INFORMATION;
-                String musicInfo = new String("가수 : " + mArtistName + "\n" + "제목 : " + mTrackName + "\n" + "음원저장경로 : " + mTrackFullPath + "\n" + "앱명 : " + mPackageName);
-                mMsg.obj = musicInfo;
-                mHandler.sendMessage(mMsg);
-                mPref.putValue("0", musicInfo, "음악 재생 정보");
-                if(!mServiceData.isMyServiceRunning(ListeningService.class)) {
-                    context.startService(mIntent);
-                }
+            if(mServiceData.isMyServiceRunning(MainService.class)) {
 
-                if(mServiceData.isMyServiceRunning(DecibelService.class)) {
-                    context.stopService(mdBIntent);
-                    mdBIntent = new Intent(context, DecibelService.class);
-                    mdBIntent.putExtra("trackFullPath", mTrackFullPath);
-                    mdBIntent.putExtra("position", startPosition);
-                    mdBIntent.putExtra("keyName", mMusicKeyName);
-                    context.startService(mdBIntent);
-                } else {
-                    mdBIntent.putExtra("trackFullPath", mTrackFullPath);
-                    mdBIntent.putExtra("position", startPosition);
-                    mdBIntent.putExtra("keyName", mMusicKeyName);
-                    context.startService(mdBIntent);
-                }
-                Log.e("음악재생여부", "재생중");
+                if (mIsPlaying) {
+                    mMsg.what = SEND_MUSIC_INFORMATION;
+                    String musicInfo = new String("가수 : " + mArtistName + "\n" + "제목 : " + mTrackName + "\n" + "음원저장경로 : " + mTrackFullPath + "\n" + "앱명 : " + mPackageName);
+                    mMsg.obj = musicInfo;
+                    mHandler.sendMessage(mMsg);
+                    mPref.putValue("0", musicInfo, "음악 재생 정보");
+                    if (!mServiceData.isMyServiceRunning(ListeningService.class)) {
+                        context.startService(mIntent);
+                    }
+
+                    if (mServiceData.isMyServiceRunning(DecibelService.class)) {
+                        context.stopService(mdBIntent);
+                        mdBIntent = new Intent(context, DecibelService.class);
+                        mdBIntent.putExtra("trackFullPath", mTrackFullPath);
+                        mdBIntent.putExtra("position", startPosition);
+                        mdBIntent.putExtra("keyName", mMusicKeyName);
+                        context.startService(mdBIntent);
+                    } else {
+                        mdBIntent.putExtra("trackFullPath", mTrackFullPath);
+                        mdBIntent.putExtra("position", startPosition);
+                        mdBIntent.putExtra("keyName", mMusicKeyName);
+                        context.startService(mdBIntent);
+                    }
+                    Log.e("음악재생여부", "재생중");
 //            mSoundfile = new SoundFile();
 //            try {
 //                mSoundfile.create(mTrackFullPath);
 //            }catch (final Exception e) {
 //                Log.e("mSoundfile이 null", "사운드 파일 없음");
 //            }
-            } else {
-                mMsg.what = SEND_MUSIC_INFORMATION;
-                String musicInfo = new String("정지");
-                mMsg.obj = musicInfo;
-                mHandler.sendMessage(mMsg);
-                //Log.i("저장값", "lastTrackName : " + mTrackName + " lastPackageName : " + mPackageName);
-                mPref.putValue("0", musicInfo, "음악 재생 정보");
-                if(mServiceData.isMyServiceRunning(ListeningService.class)) {
-                    context.stopService(mIntent);
+                } else {
+                    mMsg.what = SEND_MUSIC_INFORMATION;
+                    String musicInfo = new String("정지");
+                    mMsg.obj = musicInfo;
+                    mHandler.sendMessage(mMsg);
+                    //Log.i("저장값", "lastTrackName : " + mTrackName + " lastPackageName : " + mPackageName);
+                    mPref.putValue("0", musicInfo, "음악 재생 정보");
+                    if (mServiceData.isMyServiceRunning(ListeningService.class)) {
+                        context.stopService(mIntent);
+                    }
+                    //mdBIntent = new Intent(context, DecibelService.class);
+                    context.stopService(mdBIntent);
+                    Log.e("음악재생여부", "일시정지");
                 }
-                //mdBIntent = new Intent(context, DecibelService.class);
-                context.stopService(mdBIntent);
-                Log.e("음악재생여부", "일시정지");
             }
         } else {
-            Uri mAudioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-            String selection = MediaStore.Audio.Media.TITLE + " == \"" + mTrackName + "\"";
-            String[] STAR = {"*"};
-            String startPosition;
-            Cursor cursor = context.getContentResolver().query(mAudioUri, STAR, selection, null, null);
-            // 다운 받아져 있는 음원일 경우
-            if (cursor != null && cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                if (cursor.getColumnIndex(MediaStore.Audio.Media.TITLE) != -1) {
-                    mTrackFullPath = cursor.getString(cursor
-                            .getColumnIndex(MediaStore.Audio.Media.DATA));
-                    mArtistName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                }
-            }
-            // 스트리밍 음원일 경우
-            else {
-                mTrackFullPath = "스트리밍 음원";
-                mArtistName = intent.getStringExtra("artist");
-            }
-            mPref.putValue("lastPackageName", mPackageName, "lastTrackInformation");
-            Log.i("다른앱 음원정보 결과값","가수 : " + mArtistName + " 제목 : " + mTrackName + " 음원저장경로 : " + mTrackFullPath + " 앱명 : " + mPackageName);
+            if(mServiceData.isMyServiceRunning(MainService.class)) {
 
-            mMsg = mHandler.obtainMessage();
-            if (mIsPlaying) {
-                mMsg.what = SEND_MUSIC_INFORMATION;
-                String musicInfo = new String("가수 : " + mArtistName + "\n" + "제목 : " + mTrackName + "\n" + "음원저장경로 : " + mTrackFullPath + "\n" + "앱명 : " + mPackageName);
-                mMsg.obj = musicInfo;
-                mHandler.sendMessage(mMsg);
-                mPref.putValue("0", musicInfo, "음악 재생 정보");
-                if(!mServiceData.isMyServiceRunning(ListeningService.class)) {
-                    context.startService(mIntent);
+                Uri mAudioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                String selection = MediaStore.Audio.Media.TITLE + " == \"" + mTrackName + "\"";
+                String[] STAR = {"*"};
+                String startPosition;
+                Cursor cursor = context.getContentResolver().query(mAudioUri, STAR, selection, null, null);
+                // 다운 받아져 있는 음원일 경우
+                if (cursor != null && cursor.getCount() > 0) {
+                    cursor.moveToFirst();
+                    if (cursor.getColumnIndex(MediaStore.Audio.Media.TITLE) != -1) {
+                        mTrackFullPath = cursor.getString(cursor
+                                .getColumnIndex(MediaStore.Audio.Media.DATA));
+                        mArtistName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                    }
                 }
+                // 스트리밍 음원일 경우
+                else {
+                    mTrackFullPath = "스트리밍 음원";
+                    mArtistName = intent.getStringExtra("artist");
+                }
+                mPref.putValue("lastPackageName", mPackageName, "lastTrackInformation");
+                Log.i("다른앱 음원정보 결과값", "가수 : " + mArtistName + " 제목 : " + mTrackName + " 음원저장경로 : " + mTrackFullPath + " 앱명 : " + mPackageName);
+
+                mMsg = mHandler.obtainMessage();
+                if (mIsPlaying) {
+                    mMsg.what = SEND_MUSIC_INFORMATION;
+                    String musicInfo = new String("가수 : " + mArtistName + "\n" + "제목 : " + mTrackName + "\n" + "음원저장경로 : " + mTrackFullPath + "\n" + "앱명 : " + mPackageName);
+                    mMsg.obj = musicInfo;
+                    mHandler.sendMessage(mMsg);
+                    mPref.putValue("0", musicInfo, "음악 재생 정보");
+                    if (!mServiceData.isMyServiceRunning(ListeningService.class)) {
+                        context.startService(mIntent);
+                    }
 //                mIntent = new Intent(context, DecibelService.class);
 //                mIntent.putExtra("trackFullPath",mTrackFullPath);
 //                mIntent.putExtra("position", ())
 //                context.startService(mIntent);
-                Log.e("음악재생여부", "재생중");
+                    Log.e("음악재생여부", "재생중");
 //            mSoundfile = new SoundFile();
 //            try {
 //                mSoundfile.create(mTrackFullPath);
 //            }catch (final Exception e) {
 //                Log.e("mSoundfile이 null", "사운드 파일 없음");
 //            }
-            } else {
-                mMsg.what = SEND_MUSIC_INFORMATION;
-                String musicInfo = new String("정지");
-                mMsg.obj = musicInfo;
-                mHandler.sendMessage(mMsg);
-                //Log.i("저장값", "lastTrackName : " + mTrackName + " lastPackageName : " + mPackageName);
-                mPref.putValue("0", musicInfo, "음악 재생 정보");
-                if(mServiceData.isMyServiceRunning(ListeningService.class)) {
+                } else {
+                    mMsg.what = SEND_MUSIC_INFORMATION;
+                    String musicInfo = new String("정지");
+                    mMsg.obj = musicInfo;
+                    mHandler.sendMessage(mMsg);
+                    //Log.i("저장값", "lastTrackName : " + mTrackName + " lastPackageName : " + mPackageName);
+                    mPref.putValue("0", musicInfo, "음악 재생 정보");
+                    if (mServiceData.isMyServiceRunning(ListeningService.class)) {
+                        context.stopService(mIntent);
+                    }
+                    mIntent = new Intent(context, DecibelService.class);
                     context.stopService(mIntent);
+                    Log.e("음악재생여부", "일시정지");
                 }
-                mIntent = new Intent(context, DecibelService.class);
-                context.stopService(mIntent);
-                Log.e("음악재생여부", "일시정지");
             }
         }
 //        String all = intent.getScheme();
