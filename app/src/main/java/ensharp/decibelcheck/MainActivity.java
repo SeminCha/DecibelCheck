@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
     public static TextView elapseTxt;
     public static TextView decibelTxt;
     public static TextView volumeTxt;
-    public TextView currentPlayingAppTxt;
+    public static TextView isPlayingTxt;
 
     private static final String BLUETOOTH_HEADSET_ACTION = "android.bluetooth.headset.action.STATE_CHANGED";
     private static final String BLUETOOTH_HEADSET_STATE = "android.bluetooth.headset.extra.STATE";
@@ -46,11 +46,11 @@ public class MainActivity extends Activity {
         Log.i("처음부터 시작", "onCreate 실행");
         earphoneTxt = (TextView) findViewById(R.id.earphoneTxt);
         //bluetoothEarphoneTxt = (TextView) findViewById(R.id.bluetoothTxt);
-        musicOnTxt = (TextView) findViewById(R.id.musicOnTxt);
+        //musicOnTxt = (TextView) findViewById(R.id.musicOnTxt);
         elapseTxt = (TextView) findViewById(R.id.elapseTxt);
         decibelTxt = (TextView) findViewById(R.id.decibelsTxt);
         volumeTxt = (TextView) findViewById(R.id.volumeTxt);
-        //currentPlayingAppTxt = (TextView) findViewById(R.id.currentPlayingAppTxt);
+        isPlayingTxt = (TextView) findViewById(R.id.isPlayingTxt);
         serviceBtn = (Button) findViewById(R.id.serviceBtn);
         mAudiomanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mContext = this;
@@ -123,37 +123,39 @@ public class MainActivity extends Activity {
 
     public void setMainUiInfo() {
         if (pref.getValue("0", false, "normalEarphone")) {
-            earphoneTxt.setText("사용 중인 타입 : 일반 이어폰");
+            earphoneTxt.setText("Connected");
             Log.i("사용중인 이어폰 종류", "일반");
         } else {
             if (pref.getValue("0", false, "bluetoothEarphone")) {
-                earphoneTxt.setText("사용 중인 타입 : 블루투스 이어폰");
+                earphoneTxt.setText("Connected");
                 Log.i("사용중인 이어폰 종류", "블루투스");
             } else {
-                earphoneTxt.setText("사용 안함");
+                earphoneTxt.setText("Disconnected");
                 Log.i("사용중인 이어폰 종류", "사용안함");
             }
         }
 
         if (!mServiceData.isMyServiceRunning(MainService.class)) {
-            serviceBtn.setText("서비스 종료");
-            Log.i("서비스 러닝여부", "O");
-        } else {
             serviceBtn.setText("서비스 시작");
             Log.i("서비스 러닝여부", "X");
+        } else {
+            serviceBtn.setText("서비스 종료");
+            Log.i("서비스 러닝여부", "O");
         }
 
         if(!mServiceData.isMyServiceRunning(ListeningService.class)) {
-            musicOnTxt.setText(pref.getValue("0", "없음", "음악 재생 정보"));
+            //musicOnTxt.setText(pref.getValue("0", "없음", "음악 재생 정보"));
+            isPlayingTxt.setText("Stop");
             elapseTxt.setText(mServiceData.convertLongToHms(pref.getValue("todayListeningTime", 0, "todayInfo")));
             Log.i("리스닝 서비스 러닝여부", "X");
-        } else {
-            musicOnTxt.setText(pref.getValue("0", "없음", "음악 재생 정보"));
+       } else {
+            //musicOnTxt.setText(pref.getValue("0", "없음", "음악 재생 정보"));
+            isPlayingTxt.setText("Playing");
             Log.i("서비스 러닝여부", "O");
         }
 
         if(!mServiceData.isMyServiceRunning(DecibelService.class)) {
-            decibelTxt.setText("데시벨 없음");
+            decibelTxt.setText("0");
         }
 
         int volume = mAudiomanager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -168,9 +170,9 @@ public class MainActivity extends Activity {
                 Log.i("메인으로 넘어온 값", textContent + "?");
                 if (earphoneTxt != null) {
                     if (textContent.equals("O")) {
-                        earphoneTxt.setText("사용 중인 타입 : " + "일반 " + textName);
+                        earphoneTxt.setText("Connected");
                     } else {
-                        earphoneTxt.setText("사용안함");
+                        earphoneTxt.setText("Disconnected");
                     }
                 }
                 break;
@@ -178,9 +180,9 @@ public class MainActivity extends Activity {
                 Log.i("메인으로 넘어온 값", textContent + "?");
                 if (earphoneTxt != null) {
                     if (textContent.equals("O")) {
-                        earphoneTxt.setText("사용 중인 타입 : " + textName);
+                        earphoneTxt.setText("Connected");
                     } else {
-                        earphoneTxt.setText("사용안함");
+                        earphoneTxt.setText("Disconnected");
                     }
                 }
                 break;

@@ -91,7 +91,8 @@ public class DecibelServiceThread extends Thread {
         Log.i("전 mDecibels=",mDecibels);
         mDecibels = getDecibel();
         Log.i("후 mDecibels=",mDecibels);
-        return "현재 재생위치 : " + mSeconds + " / " + ms + " 현재 데시벨 : " + mDecibels;
+        //return "현재 재생위치 : " + mSeconds + " / " + ms + " 현재 데시벨 : " + mDecibels;
+        return mDecibels;
     }
 
     public String getDecibel() {
