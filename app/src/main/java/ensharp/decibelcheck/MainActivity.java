@@ -1,20 +1,24 @@
 package ensharp.decibelcheck;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     public static TextView earphoneTxt;
     public static TextView bluetoothEarphoneTxt;
@@ -38,6 +42,8 @@ public class MainActivity extends Activity {
     private ServiceData mServiceData;
     private Context mContext;
     private AudioManager mAudiomanager;
+
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +81,11 @@ public class MainActivity extends Activity {
             }
         });
         decibelDataSave();
+
+        mToolbar = (Toolbar) findViewById(R.id.toolBar);
+        mToolbar.setTitle("safe your ear");
+        mToolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(mToolbar);
     }
 
     public void decibelDataSave(){
@@ -217,5 +228,24 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         //Toast.makeText(this, "onResume 실행", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_personal_data_register) {
+            Intent intent = new Intent(this, MyInfo.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
