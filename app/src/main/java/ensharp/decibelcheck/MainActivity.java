@@ -240,11 +240,15 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_personal_data_register) {
+        //내 정보 페이지
+        if (id == R.id.action_personal_info) {
             Intent intent = new Intent(this, MyInfo.class);
             startActivity(intent);
             return true;
+        }
+        //청력측정 페이지
+        else if(id == R.id.action_hearing_test) {
+
         }
         return super.onOptionsItemSelected(item);
     }
