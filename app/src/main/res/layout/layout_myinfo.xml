@@ -51,7 +51,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="30dp"
                         android:gravity="center"
-                        android:text="닉네임"
+                        android:text="이름"
                         android:textColor="@color/navy"
                         android:textSize="14dp" />
                 </RelativeLayout>
@@ -62,6 +62,7 @@
                     android:layout_weight="50">
 
                     <TextView
+                        android:id="@+id/nameTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="1dp"
@@ -107,7 +108,7 @@
                         android:layout_weight="20">
 
                         <Button
-                            android:id="@+id/button"
+                            android:id="@+id/womanBtn"
                             android:layout_width="50dp"
                             android:layout_height="30dp"
                             android:layout_alignParentStart="true"
@@ -124,6 +125,7 @@
                         android:layout_weight="20">
 
                         <Button
+                            android:id="@+id/manBtn"
                             android:layout_width="50dp"
                             android:layout_height="30dp"
                             android:layout_centerHorizontal="true"
@@ -162,9 +164,10 @@
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="40">
+                    android:layout_weight="15">
 
                     <TextView
+                        android:id="@+id/ageTxt"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:layout_alignParentStart="true"
@@ -185,7 +188,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
-                        android:text="년생"
+                        android:text="살"
                         android:textAlignment="textStart"
                         android:textColor="@color/navy"
                         android:textSize="15dp" />
@@ -297,6 +300,7 @@
                         android:layout_weight="24">
 
                         <TextView
+                            android:id="@+id/earphone_companyTxt"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_marginStart="10dp"
@@ -312,6 +316,7 @@
                         android:layout_weight="24">
 
                         <TextView
+                            android:id="@+id/earphone_modelTxt"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_marginStart="10dp"
@@ -334,6 +339,7 @@
                             android:layout_weight="15">
 
                             <TextView
+                                android:id="@+id/earphone_soundpressureTxt"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="10dp"
@@ -377,6 +383,7 @@
                             android:layout_weight="13">
 
                             <TextView
+                                android:id="@+id/earphone_impedanceTxt"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="10dp"

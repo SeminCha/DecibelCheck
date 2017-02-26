@@ -99,8 +99,9 @@ public class DecibelServiceThread extends Thread {
         //W = (V * V)/R
         //dB = 10log(1/mW)
         double V, mW, dB, temp;
+        int decibel;
         int currentVolume = Integer.parseInt(VolumeBroadcastReceiver.currentVolume);
-        boolean isAutoControl = mPref.getValue("autoControl", true, "setting");
+        boolean isAutoControl = mPref.getValue("autovolume", false, "setting");
         //Log.i("getDecibel()함수", currentVolume+"");
         if (!isAutoControl) {
             //Log.i("볼륨컨트롤x", "dd");
@@ -112,7 +113,8 @@ public class DecibelServiceThread extends Thread {
             //이제부터 음원에 대한 계산
             temp = MEASURE_DECIBEL - Double.parseDouble(mDecibels);
             dB = Math.round(dB - temp);
-            return Double.toString(dB);
+            decibel = (int) dB;
+            return Integer.toString(decibel);
         } else {
             //Log.i("볼륨컨트롤O", "dd");
             V = Double.parseDouble(mPref.getValue(Integer.toString(currentVolume), "13.28", "Note5"));
@@ -133,7 +135,8 @@ public class DecibelServiceThread extends Thread {
                 currentVolume--;
                 mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, AudioManager.FLAG_PLAY_SOUND);
             }
-            return Double.toString(dB);
+            decibel = (int) dB;
+            return Integer.toString(decibel);
         }
 
     }

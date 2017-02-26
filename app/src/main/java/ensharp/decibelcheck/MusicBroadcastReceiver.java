@@ -82,6 +82,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
                 if (mIsPlaying) {
                     mMsg.what = SEND_MUSIC_INFORMATION;
                     String musicInfo = new String("가수 : " + mArtistName + "\n" + "제목 : " + mTrackName + "\n" + "음원저장경로 : " + mTrackFullPath + "\n" + "앱명 : " + mPackageName);
+                   Log.i("음악정보",musicInfo);
                     mMsg.obj = musicInfo;
                     mHandler.sendMessage(mMsg);
                     mPref.putValue("0", musicInfo, "음악 재생 정보");
