@@ -17,7 +17,7 @@ public class MyBarDataSet extends BarDataSet {
 
     @Override
     public int getColor(int index) {
-        if(getEntryForIndex(index).getY()<80) // less than 95 green
+        if(getEntryForIndex(index).getY()>80) // less than 95 green
             return mColors.get(0);
         else // greater or equal than 100 red
             return mColors.get(1);

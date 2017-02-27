@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical">
+
     <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/weekly_analysis_toolbar"
@@ -12,10 +13,41 @@
         android:layout_height="wrap_content"
         android:background="@color/navy"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"></android.support.v7.widget.Toolbar>
+        app:subtitleTextColor="@color/skyblue"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:titleTextColor="@color/white">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="80dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/weeklyanalysisTitleTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/white"
+                android:textSize="19dp" />
+
+            <TextView
+                android:id="@+id/weeklyanalysisSubTitleTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/weeklyanalysisTitleTxt"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/skyblue"
+                android:textSize="14dp" />
+        </RelativeLayout>
+
+
+    </android.support.v7.widget.Toolbar>
+
+
     <include
         layout="@layout/layout_weekly_analysis"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 </LinearLayout>
 

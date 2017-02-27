@@ -646,6 +646,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="50"
+                        android:layout_marginBottom="10dp"
                         android:orientation="horizontal"
                         android:weightSum="100">
 
@@ -717,7 +718,8 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="50">
+                        android:layout_weight="50"
+                        android:layout_marginBottom="10dp">
 
                         <TextView
                             android:layout_width="match_parent"

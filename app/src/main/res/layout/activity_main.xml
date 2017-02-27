@@ -138,9 +138,10 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:text="Connected"
+                    android:singleLine="true"
                     android:textAlignment="center"
                     android:textColor="#97b2c6"
-                    android:textSize="20dp" />
+                    android:textSize="19dp" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -218,7 +219,7 @@
                     <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="50">
+                        android:layout_weight="45">
 
                         <TextView
                             android:id="@+id/volumeTxt"
@@ -233,15 +234,15 @@
                     <RelativeLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="50">
+                        android:layout_weight="55">
 
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="vol"
-                            android:textAlignment="textStart"
+                            android:layout_marginStart="3dp"
                             android:textColor="#98aec5"
-                            android:textSize="26dp" />
+                            android:textSize="27dp" />
                     </RelativeLayout>
                 </LinearLayout>
 

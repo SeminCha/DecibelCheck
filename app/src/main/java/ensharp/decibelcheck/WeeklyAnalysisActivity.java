@@ -1,10 +1,12 @@
 package ensharp.decibelcheck;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -18,7 +20,6 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.MPPointF;
 
 import java.util.ArrayList;
 
@@ -30,7 +31,7 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
     protected BarChart mChart;
     //private SeekBar mSeekBarX, mSeekBarY;
     private TextView tvX, tvY;
-
+    private IAxisValueFormatter xAxisFormatter;
 
     public static final int COLOR_NAVY = Color.parseColor("#213b4c");
     public static final int COLOR_SKYBLUE = Color.parseColor("#02ecfb");
@@ -43,10 +44,18 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weeklyanalysis);
+        Intent intent = getIntent();
+        String week = intent.getExtras().getString("week");
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.weekly_analysis_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("2월 19일~25일");
-
+        getSupportActionBar().setTitle(null);
+        TextView weeklyanalysisTitleTxt = (TextView) findViewById(R.id.weeklyanalysisTitleTxt);
+        TextView weeklyanalysisSubTitleTxt = (TextView) findViewById(R.id.weeklyanalysisSubTitleTxt);
+        weeklyanalysisTitleTxt.setText("주간 분석");
+        weeklyanalysisSubTitleTxt.setText(week);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setTitle("주간 분석");
+//        getSupportActionBar().setSubtitle(week);
         chart = (BarChart) findViewById(R.id.chart1);
 
 //        BARENTRY = new ArrayList<>();
@@ -93,7 +102,7 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
 
         // mChart.setDrawYLabels(false);
 
-        IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(mChart);
+        xAxisFormatter = new DayAxisValueFormatter(mChart);
 
         XAxis xAxis = mChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -136,9 +145,9 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
         // l.setCustom(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
         // "def", "ghj", "ikl", "mno" });
 
-        XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
-        mv.setChartView(mChart); // For bounds control
-        mChart.setMarker(mv); // Set the marker to the chart
+//        XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
+//        mv.setChartView(mChart); // For bounds control
+//        mChart.setMarker(mv); // Set the marker to the chart
 
         setData(6, 100);
 
@@ -196,7 +205,7 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
             //set1.setDrawIcons(false);
 
             //set1.setColors(ColorTemplate.MATERIAL_COLORS);
-            set1.setColors(new int[]{this.getResources().getColor(R.color.navy_light),
+            set1.setColors(new int[]{this.getResources().getColor(R.color.orange),
                     this.getResources().getColor(R.color.navy)});
             ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
             set1.setDrawValues(false);
@@ -220,22 +229,37 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
         if (e == null)
             return;
 
-        RectF bounds = mOnValueSelectedRectF;
-        mChart.getBarBounds((BarEntry) e, bounds);
-        MPPointF position = mChart.getPosition(e, YAxis.AxisDependency.LEFT);
+        Intent intent = new Intent(this, TimeAnalysisActivity.class);
+        intent.putExtra("day",xAxisFormatter.getFormattedValue(e.getX(), null));
+        //Log.i("요일값",xAxisFormatter.getFormattedValue(e.getX(), null));
+        startActivity(intent);
 
-        Log.i("bounds", bounds.toString());
-        Log.i("position", position.toString());
-
-        Log.i("x-index",
-                "low: " + mChart.getLowestVisibleX() + ", high: "
-                        + mChart.getHighestVisibleX());
-
-        MPPointF.recycleInstance(position);
+//        RectF bounds = mOnValueSelectedRectF;
+//        mChart.getBarBounds((BarEntry) e, bounds);
+//        MPPointF position = mChart.getPosition(e, YAxis.AxisDependency.LEFT);
+//
+//        Log.i("bounds", bounds.toString());
+//        Log.i("position", position.toString());
+//
+//        Log.i("x-index",
+//                "low: " + mChart.getLowestVisibleX() + ", high: "
+//                        + mChart.getHighestVisibleX());
+//
+//        MPPointF.recycleInstance(position);
     }
 
     @Override
     public void onNothingSelected() {
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -58,9 +58,10 @@
         <receiver android:name=".VolumeBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.media.VOLUME_CHANGED_ACTION" />
-                <action android:name="android.media.EXTRA_VOLUME_STREAM_VALUE"/>
+                <action android:name="android.media.EXTRA_VOLUME_STREAM_VALUE" />
             </intent-filter>
         </receiver>
+
         <service
             android:name=".ListeningService"
             android:enabled="true"
@@ -69,12 +70,12 @@
             android:name=".DecibelService"
             android:enabled="true"
             android:exported="true"></service>
-        <activity android:name=".MyInfo">
-        </activity>
-        <activity android:name=".WeeklyAnalysisActivity">
-        </activity>
-        <activity android:name=".WeeklyInfoActivity">
-        </activity>
-    </application>
 
+        <activity android:name=".MyInfo"></activity>
+        <activity android:name=".WeeklyAnalysisActivity"></activity>
+        <activity android:name=".WeeklyInfoActivity"></activity>
+        <activity
+            android:name=".TimeAnalysisActivity"
+            android:theme="@android:style/Theme.Holo.Light.Dialog"></activity>
+    </application>
 </manifest>
