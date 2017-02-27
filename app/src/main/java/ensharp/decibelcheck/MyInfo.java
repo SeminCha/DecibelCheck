@@ -161,6 +161,8 @@ public class MyInfo extends AppCompatActivity {
                     mBreakNotificationBtn.setImageResource(R.drawable.onswitch);
                     mPref.putValue("breaknotification", true, "setting");
                     mIsBreakNotification = true;
+                    Intent intent = new Intent(MyInfo.this, BreakNotifyService.class);
+                    startService(intent);
                 }
             }
         });

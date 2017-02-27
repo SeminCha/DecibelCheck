@@ -77,5 +77,11 @@
         <activity
             android:name=".TimeAnalysisActivity"
             android:theme="@android:style/Theme.Holo.Light.Dialog"></activity>
+        <service android:name=".BreakNotifyService"
+            android:enabled="true"
+            android:exported="true"></service>
+        <activity
+            android:name=".BreakNotifyActivity"
+            android:theme="@android:style/Theme.DeviceDefault.Light.Dialog"></activity>
     </application>
 </manifest>
