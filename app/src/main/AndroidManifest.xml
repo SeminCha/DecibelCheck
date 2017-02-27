@@ -83,5 +83,8 @@
         <activity
             android:name=".BreakNotifyActivity"
             android:theme="@android:style/Theme.DeviceDefault.Light.Dialog"></activity>
+        <activity
+            android:name=".DecibelInfoActivity"
+            android:theme="@android:style/Theme.Holo.Light.Dialog"></activity>
     </application>
 </manifest>
