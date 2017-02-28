@@ -205,7 +205,7 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
             //set1.setDrawIcons(false);
 
             //set1.setColors(ColorTemplate.MATERIAL_COLORS);
-            set1.setColors(new int[]{this.getResources().getColor(R.color.orange),
+            set1.setColors(new int[]{this.getResources().getColor(R.color.skyblue),
                     this.getResources().getColor(R.color.navy)});
             ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
             set1.setDrawValues(false);

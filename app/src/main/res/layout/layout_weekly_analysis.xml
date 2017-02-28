@@ -319,14 +319,14 @@
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:orientation="vertical"
-            android:weightSum="100">
+            android:weightSum="120">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginEnd="18dp"
                 android:layout_marginStart="18dp"
-                android:layout_weight="10"
+                android:layout_weight="12"
                 android:background="@drawable/weeklyinfo_dark_bottom_seperator">
 
                 <TextView
@@ -372,6 +372,100 @@
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true" />
             </RelativeLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="7"
+                android:weightSum="100"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="18dp"
+                    android:layout_weight="22">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="50"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:textSize="13dp"
+                        android:textColor="@color/navy"
+                        android:text="평균 데시벨"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="52">
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:background="@drawable/dotted"
+                        android:layout_gravity="center"
+                        android:layerType="software" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="18dp"
+                    android:layout_weight="26">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="50"
+                        android:layout_gravity="center"
+                        android:textSize="13dp"
+                        android:textColor="@color/navy_light"
+                        android:text="76 dB (▼5)"/>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="7"
+                android:weightSum="100"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="18dp"
+                    android:layout_weight="26">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="50"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:textSize="13dp"
+                        android:textColor="@color/navy"
+                        android:text="평균 청취시간"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="47">
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp"
+                        android:background="@drawable/dotted"
+                        android:layout_gravity="center"
+                        android:layerType="software" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="18dp"
+                    android:layout_weight="29">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="50"
+                        android:layout_gravity="center"
+                        android:textSize="13dp"
+                        android:textColor="@color/navy_light"
+                        android:text="58 분 (▲10)"/>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
