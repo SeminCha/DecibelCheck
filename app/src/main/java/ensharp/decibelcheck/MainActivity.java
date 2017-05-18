@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
         mSkyCircleLayout = (FrameLayout) findViewById(R.id.skyCircleLayout);
         mRedCircleLayout = (FrameLayout) findViewById(R.id.redCircleLayout);
         mCircleParentLayout = (FrameLayout) findViewById(R.id.circleParentLayout);
-
         decibelInfoBtn = (ImageButton) findViewById(R.id.decibelsInfoBtn);
         serviceBtn = (Button) findViewById(R.id.serviceBtn);
         mAudiomanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -126,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         //mToolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(mToolbar);
         checkPermission();
+
     }
 
     public void decibelDataSave() {

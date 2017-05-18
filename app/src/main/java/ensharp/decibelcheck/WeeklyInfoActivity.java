@@ -45,6 +45,7 @@ public class WeeklyInfoActivity extends AppCompatActivity implements WeeklyRecyc
     public void onItemClick(int position) {
         Intent intent = new Intent(getBaseContext(), WeeklyAnalysisActivity.class);
         intent.putExtra("week",mWeeklyRecylerAdapter.getItem(position).getDetailWeek());
+        intent.putExtra("year", mWeeklyRecylerAdapter.getItem(position).getYear());
         startActivity(intent);
 
 //        startActivityForResult(intent, REQUEST_CODE_SPOTINFO);

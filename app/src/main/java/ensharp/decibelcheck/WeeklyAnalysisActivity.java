@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -40,12 +42,15 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
     ArrayList<String> BarEntryLabels ;
     BarDataSet Bardataset ;
     BarData BARDATA ;
+    LinearLayout backgroundLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weeklyanalysis);
         Intent intent = getIntent();
         String week = intent.getExtras().getString("week");
+        String year = intent.getExtras().getString("year");
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.weekly_analysis_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(null);
@@ -76,7 +81,24 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
 //
 //        chart.animateY(3000);
         //XAxis XAxis = mChart.getXAxis ();
-
+        String parsingWeek = week.split("~")[0];
+        String month = parsingWeek.split("월")[0];
+        String day = parsingWeek.split("월")[1].trim().split("일")[0];
+        String mKeyName = year + "_" + month +"_" + day;
+        Log.i("청취데이터 키 값",mKeyName);
+        LinearLayout dailyDecibelLayout = (LinearLayout) findViewById(R.id.dailyDecibelBar);
+        backgroundLayout = (LinearLayout) findViewById(R.id.backgroundBar);
+        ViewGroup.LayoutParams lparams = dailyDecibelLayout.getLayoutParams(); // Width , height
+        double a = 30;
+        double ratio = a/120.0;
+//        DisplayMetrics metrics = new DisplayMetrics();
+//        this.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//        double a = metrics.widthPixels;
+//        int a = backgroundLayout.getWidth();
+//        Log.e("배경막대넓이",a+"");
+        lparams.width=(int)((double)1258*ratio);
+        Log.e("lparams.width",lparams.width+"");
+        dailyDecibelLayout.setLayoutParams(lparams);
         initiate();
     }
 
@@ -226,6 +248,8 @@ public class WeeklyAnalysisActivity extends AppCompatActivity implements OnChart
     @Override
     public void onValueSelected(Entry e, Highlight h) {
 
+        int a = backgroundLayout.getWidth();
+        Log.e("배경막대넓이",a+"");
         if (e == null)
             return;
 

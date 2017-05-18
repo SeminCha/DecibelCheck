@@ -158,11 +158,15 @@
                 android:layout_weight="5">
 
                 <LinearLayout
+                    android:id="@+id/backgroundBar"
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="#e6e6e6" />
 
                 <LinearLayout
+                    android:id="@+id/dailyDecibelBar"
+                    android:orientation="horizontal"
                     android:layout_width="260dp"
                     android:layout_height="match_parent"
                     android:background="@color/navy" />

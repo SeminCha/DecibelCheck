@@ -6,9 +6,11 @@ package ensharp.decibelcheck;
 public class WeeklyData extends WeeklyInfoAdapterItem {
     private String simpleWeek;
     private String detailWeek;
+    private String year;
 
     public WeeklyData(String year, String simpleWeek, String detailWeek) {
         super(year);
+        this.year = year;
         this.simpleWeek = simpleWeek;
         this.detailWeek=detailWeek;
     }
@@ -31,4 +33,6 @@ public class WeeklyData extends WeeklyInfoAdapterItem {
     public void setDetailWeek(String detailWeek) {
         this.detailWeek = detailWeek;
     }
+
+    public String getYear(){return year;}
 }
